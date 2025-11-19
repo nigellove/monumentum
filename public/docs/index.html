@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentation - Monumentum</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      color: #1e293b;
+      line-height: 1.6;
+    }
+
+    /* Navigation */
+    nav {
+      background: white;
+      border-bottom: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #2B3674;
+      text-decoration: none;
+    }
+
+    .nav-links a {
+      color: #64748b;
+      text-decoration: none;
+      margin: 0 1.5rem;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: #2B3674;
+    }
+
+    /* Main Content */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+    }
+
+    .breadcrumb {
+      color: #64748b;
+      font-size: 0.875rem;
+      margin-bottom: 2rem;
+    }
+
+    .breadcrumb a {
+      color: #0066cc;
+      text-decoration: none;
+    }
+
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+
+    h1 {
+      color: #2B3674;
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      color: #64748b;
+      font-size: 1.125rem;
+      margin-bottom: 3rem;
+    }
+
+    h2 {
+      color: #2B3674;
+      font-size: 1.875rem;
+      margin-top: 2.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 0.5rem;
+    }
+
+    /* Doc Cards Grid */
+    .docs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+
+    .doc-card {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s;
+      border-left: 4px solid #0066cc;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .doc-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .doc-card.installation {
+      border-left-color: #0066cc;
+    }
+
+    .doc-card.customization {
+      border-left-color: #16a34a;
+    }
+
+    .doc-card.integration {
+      border-left-color: #ea580c;
+    }
+
+    .doc-card.privacy {
+      border-left-color: #8b5cf6;
+    }
+
+    .doc-card.cookie {
+      border-left-color: #f59e0b;
+    }
+
+    .doc-card.terms {
+      border-left-color: #ec4899;
+    }
+
+    .doc-card-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .doc-card h3 {
+      color: #2B3674;
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .doc-card p {
+      color: #64748b;
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+      flex-grow: 1;
+    }
+
+    .doc-card-link {
+      color: #0066cc;
+      font-weight: 600;
+      transition: color 0.3s;
+      text-decoration: none;
+    }
+
+    .doc-card:hover .doc-card-link {
+      color: #0052a3;
+    }
+
+    /* Section Divider */
+    .section-divider {
+      margin: 3rem 0;
+      text-align: center;
+    }
+
+    .section-divider h2 {
+      margin-top: 0;
+    }
+
+    /* Footer */
+    footer {
+      background: white;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 4rem;
+      padding: 2rem;
+      color: #64748b;
+      text-align: center;
+    }
+
+    footer a {
+      color: #0066cc;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 1.5rem 1rem;
+      }
+
+      h1 {
+        font-size: 1.875rem;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .docs-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav>
+    <div class="nav-container">
+      <a href="https://monumentum.ai" class="nav-logo">Monumentum</a>
+      <div class="nav-links">
+        <a href="https://monumentum.ai">Back to Site</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="https://monumentum.ai">Home</a> / Documentation
+    </div>
+
+    <h1>📚 Documentation</h1>
+    <p class="subtitle">Everything you need to get started with Monumentum and maximize your AI Sales Agent.</p>
+
+    <h2>Getting Started</h2>
+    <div class="docs-grid">
+      <a href="https://monumentum.ai/docs/installation" class="doc-card installation">
+        <div class="doc-card-icon">🚀</div>
+        <h3>Installation Guide</h3>
+        <p>Get your AI Sales Agent up and running in minutes. Step-by-step instructions for WordPress, Shopify, and custom websites.</p>
+        <span class="doc-card-link">Read Guide →</span>
+      </a>
+
+      <a href="https://monumentum.ai/docs/customization" class="doc-card customization">
+        <div class="doc-card-icon">🎨</div>
+        <h3>Customization Guide</h3>
+        <p>Customize your widget to match your brand. Configure colors, messaging, AI personality, and more.</p>
+        <span class="doc-card-link">Read Guide →</span>
+      </a>
+
+      <a href="https://monumentum.ai/docs/integration" class="doc-card integration">
+        <div class="doc-card-icon">🔗</div>
+        <h3>Integration Guide</h3>
+        <p>Connect to HubSpot, Salesforce, Pipedrive, and other tools. Automate your lead capture workflow.</p>
+        <span class="doc-card-link">Read Guide →</span>
+      </a>
+    </div>
+
+    <div class="section-divider">
+      <h2>Legal & Privacy</h2>
+      <p style="color: #64748b; margin-bottom: 2rem;">Read our terms, privacy policy, and cookie information.</p>
+    </div>
+
+    <div class="docs-grid">
+      <a href="https://monumentum.ai/docs/termsofservice.html" class="doc-card terms">
+        <div class="doc-card-icon">⚖️</div>
+        <h3>Terms of Service</h3>
+        <p>Our terms and conditions for using Monumentum services. Please review these important terms.</p>
+        <span class="doc-card-link">Read Terms →</span>
+      </a>
+
+      <a href="https://monumentum.ai/docs/privacy.html" class="doc-card privacy">
+        <div class="doc-card-icon">🔒</div>
+        <h3>Privacy Policy</h3>
+        <p>How we collect, use, and protect your data. Your privacy is our priority.</p>
+        <span class="doc-card-link">Read Policy →</span>
+      </a>
+
+      <a href="https://monumentum.ai/docs/cookie.html" class="doc-card cookie">
+        <div class="doc-card-icon">🍪</div>
+        <h3>Cookie Policy</h3>
+        <p>Information about cookies and tracking technologies we use on our site.</p>
+        <span class="doc-card-link">Read Policy →</span>
+      </a>
+    </div>
+
+    <div style="background: white; border-left: 4px solid #0066cc; border-radius: 8px; padding: 2rem; margin: 3rem 0; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+      <h3 style="color: #2B3674; margin-bottom: 1rem;">💡 Can't find what you're looking for?</h3>
+      <p style="color: #64748b; margin-bottom: 1rem;">We're here to help! Contact our support team:</p>
+      <ul style="list-style: none; padding: 0; margin: 0;">
+        <li style="margin-bottom: 0.5rem;"><strong>Email:</strong> <a href="mailto:info@monumentum.ai" style="color: #0066cc; text-decoration: none;">info@monumentum.ai</a></li>
+        <li style="margin-bottom: 0.5rem;"><strong>Live Chat:</strong> Click the chat widget on any page</li>
+        <li><strong>Dashboard:</strong> <a href="https://monumentum.ai/dashboard" style="color: #0066cc; text-decoration: none;">Access your dashboard</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>
+      <strong>Quick Links:</strong><br>
+      <a href="https://monumentum.ai">Home</a> •
+      <a href="https://monumentum.ai/dashboard">Dashboard</a> •
+      <a href="https://monumentum.ai/docs">Documentation</a> •
+      <a href="https://monumentum.ai/support">Support</a>
+    </p>
+    <p style="margin-top: 2rem; font-size: 0.875rem;">
+      © 2025 Monumentum. All rights reserved.<br>
+      <a href="mailto:info@monumentum.ai">info@monumentum.ai</a>
+    </p>
+  </footer>
+</body>
+</html>

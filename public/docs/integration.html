@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Integration Guide - Monumentum Documentation</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      color: #1e293b;
+      line-height: 1.6;
+    }
+
+    /* Navigation */
+    nav {
+      background: white;
+      border-bottom: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #2B3674;
+      text-decoration: none;
+    }
+
+    .nav-links a {
+      color: #64748b;
+      text-decoration: none;
+      margin: 0 1.5rem;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: #2B3674;
+    }
+
+    /* Main Content */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+    }
+
+    .breadcrumb {
+      color: #64748b;
+      font-size: 0.875rem;
+      margin-bottom: 2rem;
+    }
+
+    .breadcrumb a {
+      color: #0066cc;
+      text-decoration: none;
+    }
+
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+
+    h1 {
+      color: #2B3674;
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      margin-top: 2rem;
+    }
+
+    .subtitle {
+      color: #64748b;
+      font-size: 1.125rem;
+      margin-bottom: 2rem;
+    }
+
+    h2 {
+      color: #2B3674;
+      font-size: 1.875rem;
+      margin-top: 2.5rem;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 0.5rem;
+    }
+
+    h3 {
+      color: #334155;
+      font-size: 1.25rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    p {
+      margin-bottom: 1rem;
+      color: #475569;
+    }
+
+    code {
+      background: #f1f5f9;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.875em;
+      color: #e11d48;
+    }
+
+    pre {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 1.5rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.875rem;
+      line-height: 1.6;
+    }
+
+    ol, ul {
+      margin: 1rem 0 1rem 2rem;
+      color: #475569;
+    }
+
+    li {
+      margin-bottom: 0.75rem;
+    }
+
+    .card {
+      background: white;
+      border-left: 4px solid #0066cc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .card.info {
+      border-left-color: #0066cc;
+      background: #f0f9ff;
+    }
+
+    .card.success {
+      border-left-color: #16a34a;
+      background: #f0fdf4;
+    }
+
+    .card.warning {
+      border-left-color: #ea580c;
+      background: #fff7ed;
+    }
+
+    .card.coming-soon {
+      border-left-color: #7c3aed;
+      background: #faf5ff;
+    }
+
+    .card h4 {
+      color: #2B3674;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .card p {
+      color: #475569;
+      margin: 0;
+    }
+
+    a.button {
+      display: inline-block;
+      background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      margin: 1rem 0;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    a.button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+    }
+
+    /* Footer */
+    footer {
+      background: white;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 4rem;
+      padding: 2rem;
+      color: #64748b;
+      text-align: center;
+    }
+
+    footer a {
+      color: #0066cc;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 1.5rem 1rem;
+      }
+
+      h1 {
+        font-size: 1.875rem;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+
+      .nav-links {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav>
+    <div class="nav-container">
+      <a href="https://monumentum.ai" class="nav-logo">Monumentum</a>
+      <div class="nav-links">
+        <a href="https://monumentum.ai/docs/installation">Installation</a>
+        <a href="https://monumentum.ai/docs/customization">Customization</a>
+        <a href="https://monumentum.ai/docs/integration">Integration</a>
+        <a href="https://monumentum.ai">Back to Site</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="https://monumentum.ai">Home</a> / <a href="https://monumentum.ai/docs">Documentation</a> / Integration
+    </div>
+
+    <h1>📤 Lead Management & Integration Guide</h1>
+    <p class="subtitle">How to manage your captured leads and connect them to your workflow.</p>
+
+    <h2>How Leads Are Captured</h2>
+    <p>Every time a visitor has a conversation with your AI agent, a lead is automatically created:</p>
+    <ol>
+      <li>Visitor starts a chat</li>
+      <li>AI asks qualifying questions</li>
+      <li>Visitor provides their info (name, email, phone, company, details about their need)</li>
+      <li>Conversation is captured in real-time</li>
+      <li>Email notification sent to you</li>
+      <li>Lead stored in your dashboard</li>
+    </ol>
+
+    <div class="card success">
+      <h4>✅ What You Get in Each Lead</h4>
+      <ul style="margin: 1rem 0 0 0; padding-left: 20px;">
+        <li><strong>Name:</strong> Visitor's name (extracted from conversation)</li>
+        <li><strong>Email:</strong> Their email address</li>
+        <li><strong>Phone:</strong> Contact number (if provided)</li>
+        <li><strong>Company:</strong> Their company name (if provided)</li>
+        <li><strong>Message:</strong> Summary of what they said</li>
+        <li><strong>Full Transcript:</strong> Complete conversation history</li>
+        <li><strong>Lead Score:</strong> AI qualification (hot/warm/cold)</li>
+        <li><strong>Sentiment:</strong> Were they satisfied? frustrated?</li>
+        <li><strong>Timestamp:</strong> When the conversation happened</li>
+      </ul>
+    </div>
+
+    <h2>View Your Leads</h2>
+    <p>Log in to your Monumentum dashboard to see all your leads:</p>
+    <ol>
+      <li>Go to <a href="https://monumentum.ai/dashboard">monumentum.ai/dashboard</a></li>
+      <li>Navigate to "Leads" section</li>
+      <li>View all conversations with details</li>
+      <li>Search by name, company, or date</li>
+      <li>Sort by lead score (hottest leads first)</li>
+    </ol>
+
+    <h2>Email Notifications</h2>
+
+    <div class="card success">
+      <h4>✅ Available Now</h4>
+      <p>Every new lead triggers an email to your inbox with:</p>
+      <ul style="margin: 1rem 0 0 0; padding-left: 20px;">
+        <li>Visitor name and contact info</li>
+        <li>Lead qualification score (hot/warm/cold)</li>
+        <li>Summary of their need</li>
+        <li>Full conversation transcript</li>
+        <li>Link to respond or follow up</li>
+      </ul>
+      <p style="margin-top: 1rem;"><strong>Timing:</strong> Email arrives within 1-2 minutes of the conversation ending.</p>
+    </div>
+
+    <h2>Export Your Leads</h2>
+
+    <div class="card success">
+      <h4>✅ Available Now</h4>
+      <p>Download your leads anytime as a CSV file:</p>
+      <ol style="margin: 1rem 0 0 0; padding-left: 20px;">
+        <li>Go to your dashboard</li>
+        <li>Click "Leads" section</li>
+        <li>Click "Export as CSV"</li>
+        <li>Open in Excel, Google Sheets, or your CRM</li>
+      </ol>
+      <p style="margin-top: 1rem;"><strong>CSV includes:</strong> Name, Email, Phone, Company, Message Summary, Lead Score, Captured Date, Full Transcript</p>
+    </div>
+
+    <h3>Using Exported Leads</h3>
+    <p>Once you have the CSV, you can:</p>
+    <ul>
+      <li>Import into HubSpot, Salesforce, or Pipedrive</li>
+      <li>Follow up manually with your sales team</li>
+      <li>Sort by lead score to prioritize hottest prospects</li>
+      <li>Analyze trends in a spreadsheet</li>
+      <li>Share with your team</li>
+    </ul>
+
+    <h2>Automatic CRM Integration (Coming Soon)</h2>
+
+    <div class="card coming-soon">
+      <h4>🔜 HubSpot Sync</h4>
+      <p>Leads will automatically create new contacts in your HubSpot account:</p>
+      <ul style="margin: 1rem 0 0 0; padding-left: 20px;">
+        <li>No manual export needed</li>
+        <li>Contacts created in real-time</li>
+        <li>Lead score synced automatically</li>
+        <li>Custom field mapping available</li>
+      </ul>
+      <p style="margin-top: 1rem;"><strong>Setup:</strong> Click "Connect HubSpot" in dashboard and authorize.</p>
+    </div>
+
+    <div class="card coming-soon">
+      <h4>🔜 Salesforce Sync</h4>
+      <p>Leads automatically create new accounts/opportunities in Salesforce:</p>
+      <ul style="margin: 1rem 0 0 0; padding-left: 20px;">
+        <li>Instant sync on lead capture</li>
+        <li>Lead routing rules supported</li>
+        <li>Custom object support</li>
+      </ul>
+    </div>
+
+    <div class="card coming-soon">
+      <h4>🔜 Pipedrive Sync</h4>
+      <p>Leads automatically added to your Pipedrive pipeline:</p>
+      <ul style="margin: 1rem 0 0 0; padding-left: 20px;">
+        <li>Creates new deals automatically</li>
+        <li>Assigns to your team based on rules</li>
+        <li>Updates with conversation details</li>
+      </ul>
+    </div>
+
+    <h2>Weekly Analytics Report</h2>
+
+    <div class="card success">
+      <h4>✅ Available Now</h4>
+      <p>Every Sunday morning, receive an email with your week's analytics:</p>
+      <ul style="margin: 1rem 0 0 0; padding-left: 20px;">
+        <li><strong>Total conversations:</strong> How many people chatted with your agent</li>
+        <li><strong>Lead breakdown:</strong> Hot/Warm/Cold leads count</li>
+        <li><strong>Top topics:</strong> What customers asked about most</li>
+        <li><strong>Sentiment trends:</strong> Were customers happy or frustrated?</li>
+        <li><strong>Top 3 action items:</strong> Recommendations to improve conversion</li>
+      </ul>
+      <p style="margin-top: 1rem;"><strong>Note:</strong> Analytics are sent Sunday morning for the previous week (Mon-Sun).</p>
+    </div>
+
+    <h2>API Access (Future)</h2>
+
+    <div class="card coming-soon">
+      <h4>🔜 REST API (Coming Soon)</h4>
+      <p>Programmatic access to your lead data:</p>
+      <ul style="margin: 1rem 0 0 0; padding-left: 20px;">
+        <li>Retrieve leads via API</li>
+        <li>Filter by date, lead score, sentiment</li>
+        <li>Update lead status</li>
+        <li>Export custom reports</li>
+      </ul>
+      <p style="margin-top: 1rem;">For advanced developers who want to build custom workflows.</p>
+    </div>
+
+    <!--<h2>What's NOT Possible (Yet)</h2>-->
+
+    <!--<div class="card warning">
+      <h4>⚠️ Current Limitations</h4>
+      <ul style="margin: 1rem 0 0 0; padding-left: 20px;">
+        <li><strong>No appointment booking:</strong> Agent can suggest times, but can't actually book your calendar</li>
+        <li><strong>No payment processing:</strong> Agent can't take credit cards or process payments</li>
+        <li><strong>No external APIs:</strong> Agent can't check real inventory, pricing, or availability from other systems</li>
+        <li><strong>No SMS alerts:</strong> Notifications are email-only (Slack coming later)</li>
+        <li><strong>No real-time analytics:</strong> Analytics are calculated nightly, not live</li>
+        <li><strong>No custom APIs:</strong> Can't pass data to custom webhooks yet</li>
+      </ul>
+    </div>-->
+
+    <h2>Best Practices</h2>
+
+    <div class="card info">
+      <h4>💡 How to Get the Most Value</h4>
+      <ul style="margin: 1rem 0 0 0; padding-left: 20px;">
+        <li><strong>Follow up fast:</strong> Respond to hot leads within 1 hour while they're warm</li>
+        <li><strong>Review your weekly analytics:</strong> Understand what customers are really asking for</li>
+        <li><strong>Refine your greeting:</strong> If many leads are cold, adjust your greeting to better qualify</li>
+        <li><strong>Export leads weekly:</strong> Even before auto-sync, download and import to your CRM</li>
+        <li><strong>Check sentiment trends:</strong> If satisfaction drops, something might be wrong with your agent</li>
+      </ul>
+    </div>
+
+    <h2>Integration Timeline</h2>
+    <table style="width: 100%; border-collapse: collapse; margin: 2rem 0;">
+      <thead>
+        <tr style="background: #f1f5f9; border-bottom: 2px solid #e2e8f0;">
+          <th style="padding: 1rem; text-align: left; color: #2B3674;">Feature</th>
+          <th style="padding: 1rem; text-align: center; color: #16a34a;">Available</th>
+          <th style="padding: 1rem; text-align: center; color: #7c3aed;">Coming</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom: 1px solid #e2e8f0;">
+          <td style="padding: 1rem;">Email notifications</td>
+          <td style="padding: 1rem; text-align: center;">✅ Now</td>
+          <td style="padding: 1rem; text-align: center;">—</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e2e8f0;">
+          <td style="padding: 1rem;">Dashboard lead viewing</td>
+          <td style="padding: 1rem; text-align: center;">✅ Now</td>
+          <td style="padding: 1rem; text-align: center;">—</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e2e8f0;">
+          <td style="padding: 1rem;">CSV export</td>
+          <td style="padding: 1rem; text-align: center;">✅ Now</td>
+          <td style="padding: 1rem; text-align: center;">—</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e2e8f0;">
+          <td style="padding: 1rem;">Weekly analytics email</td>
+          <td style="padding: 1rem; text-align: center;">✅ Now</td>
+          <td style="padding: 1rem; text-align: center;">—</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e2e8f0;">
+          <td style="padding: 1rem;">HubSpot auto-sync</td>
+          <td style="padding: 1rem; text-align: center;">—</td>
+          <td style="padding: 1rem; text-align: center;">🔜</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e2e8f0;">
+          <td style="padding: 1rem;">Salesforce auto-sync</td>
+          <td style="padding: 1rem; text-align: center;">—</td>
+          <td style="padding: 1rem; text-align: center;">🔜</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e2e8f0;">
+          <td style="padding: 1rem;">Pipedrive auto-sync</td>
+          <td style="padding: 1rem; text-align: center;">—</td>
+          <td style="padding: 1rem; text-align: center;">🔜</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e2e8f0;">
+          <td style="padding: 1rem;">REST API</td>
+          <td style="padding: 1rem; text-align: center;">—</td>
+          <td style="padding: 1rem; text-align: center;">🔜</td>
+        </tr>
+        <tr>
+          <td style="padding: 1rem;">Slack notifications</td>
+          <td style="padding: 1rem; text-align: center;">—</td>
+          <td style="padding: 1rem; text-align: center;">🔜</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Questions?</h2>
+    <p>Need help managing your leads or understanding integrations?</p>
+    <ul>
+      <li>📧 Email us at <a href="mailto:support@monumentum.ai">support@monumentum.ai</a></li>
+      <li>📖 Read the <a href="https://monumentum.ai/docs/installation">Installation Guide</a></li>
+      <li>🎨 Check out <a href="https://monumentum.ai/docs/customization">Customization Options</a></li>
+    </ul>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>
+      <strong>Quick Links:</strong><br>
+      <a href="https://monumentum.ai/dashboard">Dashboard</a> •
+      <a href="https://monumentum.ai/docs">Documentation</a> •
+      <a href="https://monumentum.ai/support">Support</a> •
+      <a href="https://monumentum.ai/docs/termsofservice.html">Terms of Service</a>
+    </p>
+    <p style="margin-top: 2rem; font-size: 0.875rem;">
+      © 2025 Monumentum. All rights reserved.<br>
+      <a href="mailto:support@monumentum.ai">support@monumentum.ai</a>
+    </p>
+  </footer>
+</body>
+</html>

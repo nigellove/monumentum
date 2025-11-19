@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Installation Guide - Monumentum Documentation</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      color: #1e293b;
+      line-height: 1.6;
+    }
+
+    /* Navigation */
+    nav {
+      background: white;
+      border-bottom: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #2B3674;
+      text-decoration: none;
+    }
+
+    .nav-links a {
+      color: #64748b;
+      text-decoration: none;
+      margin: 0 1.5rem;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: #2B3674;
+    }
+
+    /* Main Content */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+    }
+
+    .breadcrumb {
+      color: #64748b;
+      font-size: 0.875rem;
+      margin-bottom: 2rem;
+    }
+
+    .breadcrumb a {
+      color: #0066cc;
+      text-decoration: none;
+    }
+
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+
+    h1 {
+      color: #2B3674;
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      margin-top: 2rem;
+    }
+
+    .subtitle {
+      color: #64748b;
+      font-size: 1.125rem;
+      margin-bottom: 2rem;
+    }
+
+    h2 {
+      color: #2B3674;
+      font-size: 1.875rem;
+      margin-top: 2.5rem;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 0.5rem;
+    }
+
+    h3 {
+      color: #334155;
+      font-size: 1.25rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    p {
+      margin-bottom: 1rem;
+      color: #475569;
+    }
+
+    code {
+      background: #f1f5f9;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.875em;
+      color: #e11d48;
+    }
+
+    pre {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 1.5rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.875rem;
+      line-height: 1.6;
+    }
+
+    ol, ul {
+      margin: 1rem 0 1rem 2rem;
+      color: #475569;
+    }
+
+    li {
+      margin-bottom: 0.75rem;
+    }
+
+    .card {
+      background: white;
+      border-left: 4px solid #0066cc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .card.info {
+      border-left-color: #0066cc;
+      background: #f0f9ff;
+    }
+
+    .card.success {
+      border-left-color: #16a34a;
+      background: #f0fdf4;
+    }
+
+    .card.warning {
+      border-left-color: #ea580c;
+      background: #fff7ed;
+    }
+
+    .card h4 {
+      color: #2B3674;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .card p {
+      color: #475569;
+      margin: 0;
+    }
+
+    a.button {
+      display: inline-block;
+      background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      margin: 1rem 0;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    a.button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+    }
+
+    /* Footer */
+    footer {
+      background: white;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 4rem;
+      padding: 2rem;
+      color: #64748b;
+      text-align: center;
+    }
+
+    footer a {
+      color: #0066cc;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 1.5rem 1rem;
+      }
+
+      h1 {
+        font-size: 1.875rem;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+
+      .nav-links {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav>
+    <div class="nav-container">
+      <a href="https://monumentum.ai" class="nav-logo">Monumentum</a>
+      <div class="nav-links">
+        <a href="https://monumentum.ai/docs/installation">Installation</a>
+        <a href="https://monumentum.ai/docs/customization">Customization</a>
+        <a href="https://monumentum.ai/docs/integration">Integration</a>
+        <a href="https://monumentum.ai">Back to Site</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="https://monumentum.ai">Home</a> / <a href="https://monumentum.ai/docs">Documentation</a> / Installation
+    </div>
+
+    <h1>📖 Installation Guide</h1>
+    <p class="subtitle">Get your AI agent up and running in minutes. Zero configuration needed.</p>
+
+    <h2>Step 1: Get Your Widget Code</h2>
+    <p>After signing up and completing setup, you'll receive a unique customer ID in your welcome email. Your widget code will look like this:</p>
+    <pre>&lt;!-- Monumentum AI Agent Widget --&gt;
+&lt;script src="https://cdn.monumentum.ai/chat-widget.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  MonumentumChat.init({
+    customerId: 'YOUR_CUSTOMER_ID',
+    primaryColor: '#0066cc',
+    position: 'bottom-right'
+  });
+&lt;/script&gt;</pre>
+
+    <h2>Step 2: Add to Your Website</h2>
+    <p>Copy the widget code from your welcome email and paste it just before the closing <code>&lt;/body&gt;</code> tag on your website.</p>
+
+    <h3>For Custom HTML Sites:</h3>
+    <p>Simply paste the code before the closing <code>&lt;/body&gt;</code> tag in your HTML files.</p>
+    <p>Example:</p>
+    <pre>&lt;footer&gt;
+  &lt;p class="text-xs text-white/60"&gt;
+    © <script>document.write(new Date().getFullYear())</script> Your Company. All rights reserved.
+  &lt;/p&gt;
+&lt;/footer&gt;
+
+&lt;script src="./js/vendors/alpinejs.min.js" defer&gt;&lt;/script&gt;
+&lt;script src="./js/vendors/aos.js"&gt;&lt;/script&gt;
+&lt;script src="./js/main.js"&gt;&lt;/script&gt;
+&lt;!-- Monumentum sales agent --&gt;
+&lt;script src="https://cdn.monumentum.ai/widgets/monumentum-type-chat-widget.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  MonumentumChat.init({
+    customerId: 'YOUR_ID',
+    primaryColor: '#0066cc',
+    position: 'bottom-right'
+  });
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+
+    <h3>For WordPress -- COMING SOON</h3>
+
+    <h3>For Shopify -- COMING SOON</h3>
+
+    <h3>For WooCommerce -- COMING SOON</h3>
+
+    <h2>Step 3: Your Agent is Live</h2>
+    <p>Visit your website and look for the chat widget (bottom-right corner by default). Your AI agent is now:</p>
+    <ul>
+      <li>✅ Capturing qualified leads 24/7</li>
+      <li>✅ Asking intelligent questions about visitor needs</li>
+      <li>✅ Storing conversations automatically</li>
+      <li>✅ Sending you email notifications for each lead</li>
+    </ul>
+
+    <div class="card success">
+      <h4>✅ Installation Complete!</h4>
+      <p>Your AI agent is now live. Every conversation becomes a lead record with the visitor's name, email, and details. You'll receive email notifications immediately when new leads come in.</p>
+    </div>
+
+    <h2>What Happens When Someone Visits</h2>
+    <p>Here's the actual flow:</p>
+    <ol>
+      <li>Visitor lands on your page</li>
+      <li>Chat widget appears in the corner</li>
+      <li>They click to start a conversation</li>
+      <li>Your AI agent welcomes them with your personalized greeting</li>
+      <li>AI asks qualifying questions (who you are, what you need, budget, timeline, etc.)</li>
+      <li>Conversation is captured in real-time</li>
+      <li>You get an email notification with the complete conversation</li>
+      <li>Lead appears in your dashboard</li>
+    </ol>
+
+    <h2>Your First Lead</h2>
+    <p>When your first visitor starts a conversation:</p>
+    <ul>
+      <li>🤖 Your AI agent responds using the personalized greeting and tone you set during signup</li>
+      <li>💬 The conversation is multi-turn (can go back and forth naturally)</li>
+      <li>📊 The AI qualifies the lead based on their responses</li>
+      <li>📧 You receive an email notification with their name, company, message, and lead quality score</li>
+      <li>💾 The complete conversation is stored in your dashboard</li>
+    </ul>
+
+    <h2>Troubleshooting</h2>
+    <p>If you don't see the widget on your site:</p>
+    <ul>
+      <li>Verify you pasted the code before <code>&lt;/body&gt;</code> (not in <code>&lt;head&gt;</code>)</li>
+      <li>Make sure your customer ID is correct (check your welcome email)</li>
+      <li>Clear your browser cache and do a hard refresh (Ctrl+Shift+R or Cmd+Shift+R)</li>
+      <li>Check your browser console for JavaScript errors (F12 → Console tab)</li>
+      <li>Wait 2-3 minutes for the widget to load on first installation</li>
+    </ul>
+
+    <div class="card info">
+      <h4>📞 Need Help?</h4>
+      <p>Contact us at <a href="mailto:support@monumentum.ai">support@monumentum.ai</a> and we'll help you get up and running. We typically respond within 24 hours.</p>
+    </div>
+
+    <h2>Next Steps</h2>
+    <p>Your widget is now capturing leads! Here are some optional improvements:</p>
+
+    <h3>1. Customize Your Agent's Personality</h3>
+    <p>Make your AI sound like your brand. Go to your dashboard and adjust:</p>
+    <ul>
+      <li>Your greeting message (first thing visitors see)</li>
+      <li>Tone of voice (professional, friendly, casual)</li>
+      <li>Business hours (so AI knows when you're available)</li>
+      <li>What information to collect from leads</li>
+    </ul>
+    <a href="https://monumentum.ai/docs/customization" class="button">Read Customization Guide →</a>
+
+    <h3>2. Export Your Leads</h3>
+    <p>Download your leads as CSV and import into your CRM or follow up manually. Coming soon: automatic sync to HubSpot, Salesforce, and Pipedrive.</p>
+    <a href="https://monumentum.ai/docs/integration" class="button">Learn About Lead Management →</a>
+
+    <h3>3. Track Performance</h3>
+    <p>Every Sunday morning, you'll get an email with that week's analytics. See what customers are asking about, sentiment trends, and which leads are most qualified.</p>
+
+    <h2>Product Availability</h2>
+    <p>Monumentum offers three agent types:</p>
+    <ul>
+      <li><strong>Sales Agent:</strong> Captures and qualifies sales leads (✅ Live now)</li>
+      <li><strong>Customer Service Agent:</strong> Answers support questions using your policies (✅ Live now)</li>
+      <li><strong>Integrated Agent:</strong> Handles both sales and support in one chat (✅ Live now)</li>
+    </ul>
+
+    <h2>Additional Resources</h2>
+    <ul>
+      <li><a href="https://monumentum.ai/docs/customization">Customization Guide</a> - Control your agent's personality and behavior</li>
+      <li><a href="https://monumentum.ai/docs/integration">Integration Guide</a> - Export leads and manage your data</li>
+      <li><a href="https://monumentum.ai">Back to Monumentum</a> - Return to main site</li>
+    </ul>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>
+      <strong>Quick Links:</strong><br>
+      <a href="https://monumentum.ai/dashboard">Dashboard</a> •
+      <a href="https://monumentum.ai/docs">Documentation</a> •
+      <a href="https://monumentum.ai/support">Support</a> •
+      <a href="https://monumentum.ai/docs/termsofservice.html">Terms of Service</a>
+    </p>
+    <p style="margin-top: 2rem; font-size: 0.875rem;">
+      © <script>document.write(new Date().getFullYear())</script> Monumentum. All rights reserved.<br>
+      <a href="mailto:support@monumentum.ai">support@monumentum.ai</a>
+    </p>
+  </footer>
+</body>
+</html>

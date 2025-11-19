@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customization Guide - Monumentum Documentation</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      color: #1e293b;
+      line-height: 1.6;
+    }
+
+    /* Navigation */
+    nav {
+      background: white;
+      border-bottom: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #2B3674;
+      text-decoration: none;
+    }
+
+    .nav-links a {
+      color: #64748b;
+      text-decoration: none;
+      margin: 0 1.5rem;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: #2B3674;
+    }
+
+    /* Main Content */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+    }
+
+    .breadcrumb {
+      color: #64748b;
+      font-size: 0.875rem;
+      margin-bottom: 2rem;
+    }
+
+    .breadcrumb a {
+      color: #0066cc;
+      text-decoration: none;
+    }
+
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+
+    h1 {
+      color: #2B3674;
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      margin-top: 2rem;
+    }
+
+    .subtitle {
+      color: #64748b;
+      font-size: 1.125rem;
+      margin-bottom: 2rem;
+    }
+
+    h2 {
+      color: #2B3674;
+      font-size: 1.875rem;
+      margin-top: 2.5rem;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 0.5rem;
+    }
+
+    h3 {
+      color: #334155;
+      font-size: 1.25rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    p {
+      margin-bottom: 1rem;
+      color: #475569;
+    }
+
+    code {
+      background: #f1f5f9;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.875em;
+      color: #e11d48;
+    }
+
+    pre {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 1.5rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.875rem;
+      line-height: 1.6;
+    }
+
+    ol, ul {
+      margin: 1rem 0 1rem 2rem;
+      color: #475569;
+    }
+
+    li {
+      margin-bottom: 0.75rem;
+    }
+
+    .card {
+      background: white;
+      border-left: 4px solid #0066cc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .card.info {
+      border-left-color: #0066cc;
+      background: #f0f9ff;
+    }
+
+    .card.success {
+      border-left-color: #16a34a;
+      background: #f0fdf4;
+    }
+
+    .card.warning {
+      border-left-color: #ea580c;
+      background: #fff7ed;
+    }
+
+    .card.coming-soon {
+      border-left-color: #7c3aed;
+      background: #faf5ff;
+    }
+
+    .card h4 {
+      color: #2B3674;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .card p {
+      color: #475569;
+      margin: 0;
+    }
+
+    a.button {
+      display: inline-block;
+      background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      margin: 1rem 0;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    a.button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+    }
+
+    /* Footer */
+    footer {
+      background: white;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 4rem;
+      padding: 2rem;
+      color: #64748b;
+      text-align: center;
+    }
+
+    footer a {
+      color: #0066cc;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 1.5rem 1rem;
+      }
+
+      h1 {
+        font-size: 1.875rem;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+
+      .nav-links {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav>
+    <div class="nav-container">
+      <a href="https://monumentum.ai" class="nav-logo">Monumentum</a>
+      <div class="nav-links">
+        <a href="https://monumentum.ai/docs/installation">Installation</a>
+        <a href="https://monumentum.ai/docs/customization">Customization</a>
+        <a href="https://monumentum.ai/docs/integration">Integration</a>
+        <a href="https://monumentum.ai">Back to Site</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="https://monumentum.ai">Home</a> / <a href="https://monumentum.ai/docs">Documentation</a> / Customization
+    </div>
+
+    <h1>🎨 Customization Guide</h1>
+    <p class="subtitle">Make your AI agent sound like your business.</p>
+
+    <h2>Control Your Agent's Personality</h2>
+    <p>Your AI agent learns how to respond based on the settings you configure during setup. Here's what you can control:</p>
+
+    <h3>Personalized Greeting</h3>
+    <p>Set the first message visitors see when they open the chat. This is crucial—it tells them what your business does.</p>
+    <ul>
+      <li><strong>Generic:</strong> "Hi! How can I help?"</li>
+      <li><strong>Better:</strong> "Hi! Need help with HVAC repair or maintenance?"</li>
+      <li><strong>Best:</strong> "Hi! Looking for commercial HVAC solutions? We specialize in complex industrial systems."</li>
+    </ul>
+    <p>A specific greeting immediately qualifies visitors and sets expectations.</p>
+
+    <h3>Tone of Voice</h3>
+    <p>Choose how your agent communicates. This affects word choice, sentence structure, and overall feel:</p>
+    <ul>
+      <li><strong>Professional:</strong> Formal, detail-oriented, business language</li>
+      <li><strong>Friendly:</strong> Warm, conversational, approachable</li>
+      <li><strong>Casual:</strong> Relaxed, fun, informal</li>
+    </ul>
+    <p>The tone you choose will be applied throughout the entire conversation.</p>
+
+    <h3>Business Overview</h3>
+    <p>Describe what you do in 2-3 sentences. The AI uses this to personalize responses:</p>
+    <ul>
+      <li><strong>What you do:</strong> "We provide HVAC repair and maintenance"</li>
+      <li><strong>Who you serve:</strong> "for commercial office buildings"</li>
+      <li><strong>What makes you different:</strong> "with same-day emergency service"</li>
+    </ul>
+    <p>Example: "Peak Home Services provides emergency HVAC repair and maintenance for commercial buildings in the tri-state area. We specialize in same-day response for critical systems."</p>
+
+    <h3>Business Hours</h3>
+    <p>Tell your agent when you're available. The AI uses this to set expectations:</p>
+    <ul>
+      <li>"Mon-Fri 8am-6pm, Sat 9am-1pm"</li>
+      <li>"24/7 emergency service available"</li>
+      <li>"Response within 2 hours during business hours"</li>
+    </ul>
+
+    <h3>Lead Collection</h3>
+    <p>Specify which information you want to collect from visitors. Your agent will naturally ask for these details:</p>
+    <ul>
+      <li>Name ✅ (always collected)</li>
+      <li>Email ✅ (always collected)</li>
+      <li>Phone (optional)</li>
+      <li>Company (optional)</li>
+      <li>Industry (optional)</li>
+      <li>Budget (optional)</li>
+      <li>Timeline (optional)</li>
+      <li>Custom fields (optional)</li>
+    </ul>
+
+    <div class="card success">
+      <h4>✅ Available Now</h4>
+      <p>All of the above settings are available in your dashboard right now. Change them anytime—updates take effect immediately on new conversations.</p>
+    </div>
+
+    <h2>Agent-Specific Customization</h2>
+
+    <h3>Sales Agent</h3>
+    <p>If you're using the Sales Agent, you can customize:</p>
+    <ul>
+      <li>✅ Greeting message</li>
+      <li>✅ Tone of voice</li>
+      <li>✅ Business description</li>
+      <li>✅ Lead fields to capture</li>
+      <li>✅ Business hours</li>
+    </ul>
+
+    <h3>Customer Service Agent</h3>
+    <p>If you're using the Customer Service Agent, you can customize:</p>
+    <ul>
+      <li>✅ Service policy (upload your own or select a template)</li>
+      <li>✅ Greeting message</li>
+      <li>✅ Tone of voice</li>
+      <li>✅ Business hours</li>
+      <li>✅ Escalation triggers (when to flag for human review)</li>
+    </ul>
+
+    <h3>Integrated Agent</h3>
+    <p>If you're using the Integrated Agent (Sales + Service), you can customize all of the above for both modes.</p>
+
+    <h2>What's Coming Soon</h2>
+
+    <div class="card coming-soon">
+      <h4>🎨 Visual Customization (Q1 2025)</h4>
+      <p>We're building dashboard controls for:</p>
+      <ul style="margin: 1rem 0 0 0; padding-left: 20px;">
+        <li>Widget colors (match your brand)</li>
+        <li>Logo upload (display your brand)</li>
+        <li>Widget position (move to any corner)</li>
+        <li>Custom fonts</li>
+        <li>Avatar images</li>
+      </ul>
+      <p style="margin-top: 1rem; font-size: 0.95rem;"><strong>For now:</strong> Your widget uses our default blue theme. The AI personality is fully customizable.</p>
+    </div>
+
+    <div class="card coming-soon">
+      <h4>🧪 A/B Testing (Q2 2025)</h4>
+      <p>Test different greetings, tones, and questions to see what resonates best with your visitors. Optimize conversion rates based on data.</p>
+    </div>
+
+    <h2>Best Practices</h2>
+
+    <div class="card info">
+      <h4>💡 Pro Tips</h4>
+      <ul style="margin: 1rem 0 0 0; padding-left: 20px;">
+        <li><strong>Be specific in your greeting:</strong> "Hi! Need help with industrial HVAC?" outperforms "Hi! How can I help?"</li>
+        <li><strong>Match your tone to your audience:</strong> B2B = professional. D2C = friendly.</li>
+        <li><strong>Describe your business clearly:</strong> "Plumbing repair" is less effective than "Licensed plumbing repair for residential homes in Chicago."</li>
+        <li><strong>Request only essential info:</strong> Asking for 10 fields drops conversion 60%. Ask for name + email first, then expand.</li>
+        <li><strong>Update your hours accurately:</strong> If your agent says you're open 9-5 but it's 6pm, visitors get frustrated.</li>
+      </ul>
+    </div>
+
+    <h2>Comparison: Real vs. Coming Soon</h2>
+    <table style="width: 100%; border-collapse: collapse; margin: 2rem 0;">
+      <thead>
+        <tr style="background: #f1f5f9; border-bottom: 2px solid #e2e8f0;">
+          <th style="padding: 1rem; text-align: left; color: #2B3674;">Feature</th>
+          <th style="padding: 1rem; text-align: center; color: #16a34a;">Available</th>
+          <th style="padding: 1rem; text-align: center; color: #7c3aed;">Coming Soon</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom: 1px solid #e2e8f0;">
+          <td style="padding: 1rem;">Greeting message</td>
+          <td style="padding: 1rem; text-align: center;">✅</td>
+          <td style="padding: 1rem; text-align: center;">—</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e2e8f0;">
+          <td style="padding: 1rem;">Tone of voice</td>
+          <td style="padding: 1rem; text-align: center;">✅</td>
+          <td style="padding: 1rem; text-align: center;">—</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e2e8f0;">
+          <td style="padding: 1rem;">Business description</td>
+          <td style="padding: 1rem; text-align: center;">✅</td>
+          <td style="padding: 1rem; text-align: center;">—</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e2e8f0;">
+          <td style="padding: 1rem;">Lead fields</td>
+          <td style="padding: 1rem; text-align: center;">✅</td>
+          <td style="padding: 1rem; text-align: center;">—</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e2e8f0;">
+          <td style="padding: 1rem;">Widget colors</td>
+          <td style="padding: 1rem; text-align: center;">—</td>
+          <td style="padding: 1rem; text-align: center;">🔜</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e2e8f0;">
+          <td style="padding: 1rem;">Logo upload</td>
+          <td style="padding: 1rem; text-align: center;">—</td>
+          <td style="padding: 1rem; text-align: center;">🔜</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e2e8f0;">
+          <td style="padding: 1rem;">Widget positioning</td>
+          <td style="padding: 1rem; text-align: center;">—</td>
+          <td style="padding: 1rem; text-align: center;">🔜</td>
+        </tr>
+        <tr>
+          <td style="padding: 1rem;">A/B testing</td>
+          <td style="padding: 1rem; text-align: center;">—</td>
+          <td style="padding: 1rem; text-align: center;">🔜</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Need Help?</h2>
+    <p>Have questions about customizing your agent? We're here to help:</p>
+    <ul>
+      <li>📧 Email <a href="mailto:support@monumentum.ai">support@monumentum.ai</a></li>
+      <li>📚 Check the <a href="https://monumentum.ai/docs/installation">Installation Guide</a></li>
+      <li>💬 See how leads are managed in the <a href="https://monumentum.ai/docs/integration">Integration Guide</a></li>
+    </ul>
+
+    <h2>Next Steps</h2>
+    <p>Now that you understand customization, learn how to manage and export your leads:</p>
+    <a href="https://monumentum.ai/docs/integration" class="button">Read Integration Guide →</a>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>
+      <strong>Quick Links:</strong><br>
+      <a href="https://monumentum.ai/dashboard">Dashboard</a> •
+      <a href="https://monumentum.ai/docs">Documentation</a> •
+      <a href="https://monumentum.ai/support">Support</a> •
+      <a href="https://monumentum.ai/docs/termsofservice.html">Terms of Service</a>
+    </p>
+    <p style="margin-top: 2rem; font-size: 0.875rem;">
+      © <span id="year"></span> Monumentum. All rights reserved.<br>
+      <a href="mailto:support@monumentum.ai">support@monumentum.ai</a>
+    </p>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
