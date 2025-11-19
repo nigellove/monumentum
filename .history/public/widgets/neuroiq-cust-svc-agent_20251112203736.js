@@ -3,7 +3,7 @@
   
   const NeuroIQChat = {
     config: {
-      webhookUrl: 'https://neuroiq.app.n8n.cloud/webhook/Monumentum-IB-Sales', //https://neuroiq.app.n8n.cloud/webhook/Monumentum-IB-Sales
+      webhookUrl: 'https://neuroiq.app.n8n.cloud/webhook/Customer-Svc', // Customer Service endpoint
       customerId: null,
       position: 'bottom-right',
       primaryColor: '#0066cc',
@@ -269,7 +269,7 @@
       window.id = 'neuroiq-chat-window';
       window.innerHTML = `
         <div id="neuroiq-chat-header">
-          <strong>Chat with Us</strong>
+          <strong>Customer Support</strong>
           <button id="neuroiq-chat-close" style="background:none;border:none;color:white;font-size:24px;cursor:pointer;line-height:1;padding:0;width:30px;height:30px;" aria-label="Close chat">×</button>
         </div>
         <div id="neuroiq-chat-messages">
@@ -362,10 +362,9 @@ attachEventListeners: function() {
         this.history.push({ role: 'user', content: message });
         this.history.push({ role: 'assistant', content: reply });
         
-        // Show lead captured notification
-        if (data.hasLead && data.leadData) {
-          const name = data.leadData.name ? ` for ${data.leadData.name}` : '';
-          this.addMessage(`✅ Lead captured${name}. We'll be in touch soon!`, 'system');
+        // Show ticket created notification
+        if (data.hasTicket && data.ticketData) {
+          this.addMessage(`✅ Support ticket created. We'll get back to you soon!`, 'system');
         }
         
         // Show conversation completed notice
@@ -420,8 +419,7 @@ attachEventListeners: function() {
   window.NeuroIQChat = NeuroIQChat;
   
   // Log version for debugging
-  console.log('NeuroIQ Chat Widget v1.0 loaded');
-  
+  console.log('NeuroIQ Customer Service Widget v1.0 loaded');
   // ✅ Clear stored session when the browser/tab closes
   window.addEventListener('beforeunload', () => {
     try {
@@ -441,5 +439,3 @@ attachEventListeners: function() {
     }
   });
 })();
-
-

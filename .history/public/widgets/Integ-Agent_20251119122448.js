@@ -1,9 +1,9 @@
 (function() {
   'use strict';
   
-  const NeuroIQChat = {
+  const MonumentumChat = {
     config: {
-      webhookUrl: 'https://neuroiq.app.n8n.cloud/webhook/Monumentum-IB-Sales', //https://neuroiq.app.n8n.cloud/webhook/Monumentum-IB-Sales
+      webhookUrl: 'https://neuroiq.app.n8n.cloud/webhook/Integrated_Agent', // Integrated agent endpoint
       customerId: null,
       position: 'bottom-right',
       primaryColor: '#0066cc',
@@ -20,7 +20,7 @@
       
       // Validate customerId
       if (!this.config.customerId) {
-        console.error('NeuroIQ: customerId is required');
+        console.error('Monumentum: customerId is required');
         return;
       }
       
@@ -41,7 +41,7 @@
     },
     
     getOrCreateSession: function() {
-      const storageKey = `neuroiq_session_${this.config.customerId}`;
+      const storageKey = `monumentum_session_${this.config.customerId}`;
       let sessionId = localStorage.getItem(storageKey);
       
       if (!sessionId) {
@@ -51,10 +51,11 @@
       
       return sessionId;
     },
+
     
     injectStyles: function() {
       const styles = `
-        #neuroiq-chat-button {
+        #monumentum-chat-button {
           position: fixed;
           ${this.config.position.includes('right') ? 'right: 20px;' : 'left: 20px;'}
           ${this.config.position.includes('bottom') ? 'bottom: 20px;' : 'top: 20px;'}
@@ -73,11 +74,11 @@
           transition: transform 0.3s;
         }
         
-        #neuroiq-chat-button:hover {
+        #monumentum-chat-button:hover {
           transform: scale(1.1);
         }
         
-        #neuroiq-chat-window {
+        #monumentum-chat-window {
           position: fixed;
           ${this.config.position.includes('right') ? 'right: 20px;' : 'left: 20px;'}
           ${this.config.position.includes('bottom') ? 'bottom: 90px;' : 'top: 90px;'}
@@ -94,11 +95,11 @@
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         
-        #neuroiq-chat-window.open {
+        #monumentum-chat-window.open {
           display: flex;
         }
         
-        #neuroiq-chat-header {
+        #monumentum-chat-header {
           background: ${this.config.primaryColor};
           color: white;
           padding: 16px;
@@ -109,7 +110,7 @@
           font-weight: 600;
         }
         
-        #neuroiq-chat-messages {
+        #monumentum-chat-messages {
           flex: 1;
           overflow-y: auto;
           padding: 16px;
@@ -119,7 +120,7 @@
           background: #fafafa;
         }
         
-        .neuroiq-message {
+        .monumentum-message {
           max-width: 80%;
           padding: 10px 14px;
           border-radius: 18px;
@@ -127,14 +128,14 @@
           line-height: 1.4;
         }
         
-        .neuroiq-message.user {
+        .monumentum-message.user {
           background: ${this.config.primaryColor};
           color: white;
           align-self: flex-end;
           border-bottom-right-radius: 4px;
         }
         
-        .neuroiq-message.assistant {
+        .monumentum-message.assistant {
           background: white;
           color: #333;
           align-self: flex-start;
@@ -142,7 +143,7 @@
           box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
         
-        .neuroiq-message a {
+        .monumentum-message a {
           color: #0066cc;
           text-decoration: underline;
           display: block;
@@ -150,7 +151,7 @@
           word-break: break-all;
         }
         
-        .neuroiq-message.system {
+        .monumentum-message.system {
           background: #fff9e6;
           color: #856404;
           align-self: center;
@@ -159,7 +160,7 @@
           border: 1px solid #ffeaa7;
         }
         
-        #neuroiq-chat-input-container {
+        #monumentum-chat-input-container {
           padding: 16px;
           border-top: 1px solid #e0e0e0;
           display: flex;
@@ -168,7 +169,7 @@
           border-radius: 0 0 12px 12px;
         }
         
-        #neuroiq-chat-input {
+        #monumentum-chat-input {
           flex: 1;
           padding: 10px 12px;
           border: 1px solid #ddd;
@@ -178,11 +179,11 @@
           font-family: inherit;
         }
         
-        #neuroiq-chat-input:focus {
+        #monumentum-chat-input:focus {
           border-color: ${this.config.primaryColor};
         }
         
-        #neuroiq-chat-send {
+        #monumentum-chat-send {
           background: ${this.config.primaryColor};
           color: white;
           border: none;
@@ -196,16 +197,16 @@
           transition: opacity 0.2s;
         }
         
-        #neuroiq-chat-send:hover {
+        #monumentum-chat-send:hover {
           opacity: 0.9;
         }
         
-        #neuroiq-chat-send:disabled {
+        #monumentum-chat-send:disabled {
           opacity: 0.5;
           cursor: not-allowed;
         }
         
-        .neuroiq-typing {
+        .monumentum-typing {
           display: none;
           padding: 10px 14px;
           background: white;
@@ -215,11 +216,11 @@
           box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
         
-        .neuroiq-typing.show {
+        .monumentum-typing.show {
           display: block;
         }
         
-        .neuroiq-typing span {
+        .monumentum-typing span {
           height: 8px;
           width: 8px;
           background: #999;
@@ -229,8 +230,8 @@
           animation: bounce 1.4s infinite ease-in-out both;
         }
         
-        .neuroiq-typing span:nth-child(1) { animation-delay: -0.32s; }
-        .neuroiq-typing span:nth-child(2) { animation-delay: -0.16s; }
+        .monumentum-typing span:nth-child(1) { animation-delay: -0.32s; }
+        .monumentum-typing span:nth-child(2) { animation-delay: -0.16s; }
         
         @keyframes bounce {
           0%, 80%, 100% { transform: scale(0); }
@@ -238,7 +239,7 @@
         }
         
         @media (max-width: 480px) {
-          #neuroiq-chat-window {
+          #monumentum-chat-window {
             width: calc(100vw - 20px);
             height: calc(100vh - 100px);
             right: 10px !important;
@@ -256,7 +257,7 @@
     createChatUI: function() {
       // Chat button
       const button = document.createElement('button');
-      button.id = 'neuroiq-chat-button';
+      button.id = 'monumentum-chat-button';
       button.setAttribute('aria-label', 'Open chat');
       button.innerHTML = `
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -265,39 +266,37 @@
       `;
       
       // Chat window
-      const window = document.createElement('div');
-      window.id = 'neuroiq-chat-window';
-      window.innerHTML = `
-        <div id="neuroiq-chat-header">
-          <strong>Chat with Us</strong>
-          <button id="neuroiq-chat-close" style="background:none;border:none;color:white;font-size:24px;cursor:pointer;line-height:1;padding:0;width:30px;height:30px;" aria-label="Close chat">×</button>
-        </div>
-        <div id="neuroiq-chat-messages">
-          <div class="neuroiq-message assistant">${this.config.greeting}</div>
-        </div>
-        <div class="neuroiq-typing">
-          <span></span><span></span><span></span>
-        </div>
-        <div id="neuroiq-chat-input-container">
-          <input type="text" id="neuroiq-chat-input" placeholder="Type your message..." aria-label="Chat message" />
-          <button id="neuroiq-chat-send" aria-label="Send message">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="22" y1="2" x2="11" y2="13"></line>
-              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-            </svg>
-          </button>
-        </div>
-      `;
+   const window = document.createElement('div');
+  window.id = 'monumentum-chat-window';
+  window.innerHTML = `
+    <div id="monumentum-chat-header">
+      <strong>Chat with Us</strong>
+      <button id="monumentum-chat-close" style="background:none;border:none;color:white;font-size:24px;cursor:pointer;line-height:1;padding:0;width:30px;height:30px;" aria-label="Close chat">×</button>
+    </div>
+    <div id="monumentum-chat-messages"></div>
+    <div class="monumentum-typing">
+      <span></span><span></span><span></span>
+    </div>
+    <div id="monumentum-chat-input-container">
+      <input type="text" id="monumentum-chat-input" placeholder="Type your message..." aria-label="Chat message" />
+      <button id="monumentum-chat-send" aria-label="Send message">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+      </button>
+    </div>
+  `;
       
       document.body.appendChild(button);
       document.body.appendChild(window);
     },
     
 attachEventListeners: function() {
-  const button = document.getElementById('neuroiq-chat-button');
-  const closeBtn = document.getElementById('neuroiq-chat-close');
-  const sendBtn = document.getElementById('neuroiq-chat-send');
-  const input = document.getElementById('neuroiq-chat-input');
+  const button = document.getElementById('monumentum-chat-button');
+  const closeBtn = document.getElementById('monumentum-chat-close');
+  const sendBtn = document.getElementById('monumentum-chat-send');
+  const input = document.getElementById('monumentum-chat-input');
   
   button.addEventListener('click', () => this.toggleChat());
   closeBtn.addEventListener('click', () => this.toggleChat());
@@ -307,21 +306,30 @@ attachEventListeners: function() {
   });
 },
     
-    toggleChat: function() {
-      const window = document.getElementById('neuroiq-chat-window');
-      this.chatOpen = !this.chatOpen;
-      
-      if (this.chatOpen) {
-        window.classList.add('open');
-        document.getElementById('neuroiq-chat-input').focus();
-      } else {
-        window.classList.remove('open');
-      }
-    },
+toggleChat: function() {
+  const window = document.getElementById('monumentum-chat-window');
+  this.chatOpen = !this.chatOpen;
+
+  if (this.chatOpen) {
+    window.classList.add('open');
+    document.getElementById('monumentum-chat-input').focus();
+
+    // ✅ SHOW INITIAL BUSINESS GREETING ON FIRST OPEN
+    if (this.history.length === 0) {
+      const greeting =
+        this.config.businessGreeting ||
+        "Hi there! How can I help you today?";
+      this.addMessage(greeting, 'assistant');
+    }
+
+  } else {
+    window.classList.remove('open');
+  }
+},
     
     sendMessage: function() {
-      const input = document.getElementById('neuroiq-chat-input');
-      const sendBtn = document.getElementById('neuroiq-chat-send');
+      const input = document.getElementById('monumentum-chat-input');
+      const sendBtn = document.getElementById('monumentum-chat-send');
       const message = input.value.trim();
       
       if (!message) return;
@@ -339,61 +347,61 @@ attachEventListeners: function() {
       
       // Send to webhook WITH HISTORY ✅
       fetch(this.config.webhookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          customerId: this.config.customerId,
-          sessionId: this.sessionId,
-          message: message,
-          history: this.history  // ✅ CRITICAL: Send conversation history
-        })
-      })
-      .then(res => {
-        if (!res.ok) throw new Error('Network response was not ok');
-        return res.json();
-      })
-      .then(data => {
-        this.showTyping(false);
-        
-        const reply = data.message || 'Sorry, I didn\'t understand that.';
-        this.addMessage(reply, 'assistant');
-        
-        // ✅ UPDATE LOCAL HISTORY
-        this.history.push({ role: 'user', content: message });
-        this.history.push({ role: 'assistant', content: reply });
-        
-        // Show lead captured notification
-        if (data.hasLead && data.leadData) {
-          const name = data.leadData.name ? ` for ${data.leadData.name}` : '';
-          this.addMessage(`✅ Lead captured${name}. We'll be in touch soon!`, 'system');
-        }
-        
-        // Show conversation completed notice
-        if (data.conversationCompleted) {
-          this.addMessage('🟢 Thank you! This conversation has been completed. Feel free to start a new chat if you have more questions.', 'system');
-        }
-        
-        // Re-enable input
-        input.disabled = false;
-        sendBtn.disabled = false;
-        input.focus();
-      })
-      .catch(err => {
-        this.showTyping(false);
-        this.addMessage('Sorry, something went wrong. Please try again.', 'assistant');
-        console.error('Chat error:', err);
-        
-        // Re-enable input
-        input.disabled = false;
-        sendBtn.disabled = false;
-        input.focus();
-      });
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    customerId: this.config.customerId,
+    sessionId: this.sessionId,
+    message: message,
+    history: this.history
+  })
+})
+.then(async res => {
+  if (!res.ok) throw new Error('Network response was not ok');
+  const text = await res.text();
+  try { return JSON.parse(text); }
+  catch { return { message: text }; }
+})
+.then(data => {
+  this.showTyping(false);
+
+  const reply = data.message || 'Sorry, I didn\'t understand that.';
+  this.addMessage(reply, 'assistant');
+
+  this.history.push({ role: 'user', content: message });
+  this.history.push({ role: 'assistant', content: reply });
+
+  if (data.hasLead && data.leadData) {
+    const name = data.leadData.name ? ` for ${data.leadData.name}` : '';
+    this.addMessage(`✅ Lead captured${name}. We'll be in touch soon!`, 'system');
+  }
+
+  if (data.hasTicket && data.ticketData) {
+    this.addMessage(`✅ Support ticket created. We'll get back to you soon!`, 'system');
+  }
+
+  if (data.conversationCompleted) {
+    this.addMessage('🟢 Thank you! This conversation has been completed. Feel free to start a new chat if you have more questions.', 'system');
+  }
+
+  input.disabled = false;
+  sendBtn.disabled = false;
+  input.focus();
+})
+.catch(err => {
+  this.showTyping(false);
+  this.addMessage('Sorry, something went wrong. Please try again.', 'assistant');
+  console.error('Chat error:', err);
+  input.disabled = false;
+  sendBtn.disabled = false;
+  input.focus();
+});
     },
     
     addMessage: function(text, role) {
-      const messagesContainer = document.getElementById('neuroiq-chat-messages');
+      const messagesContainer = document.getElementById('monumentum-chat-messages');
       const messageDiv = document.createElement('div');
-      messageDiv.className = `neuroiq-message ${role}`;
+      messageDiv.className = `monumentum-message ${role}`;
       
       // ✅ AUTO-LINK URLs (make Calendly/booking links clickable)
       const linkedText = text.replace(
@@ -407,7 +415,7 @@ attachEventListeners: function() {
     },
     
     showTyping: function(show) {
-      const typing = document.querySelector('.neuroiq-typing');
+      const typing = document.querySelector('.monumentum-typing');
       if (show) {
         typing.classList.add('show');
       } else {
@@ -417,29 +425,27 @@ attachEventListeners: function() {
   };
   
   // Expose globally
-  window.NeuroIQChat = NeuroIQChat;
+  window.MonumentumChat = MonumentumChat;
   
   // Log version for debugging
-  console.log('NeuroIQ Chat Widget v1.0 loaded');
-  
+  console.log('Monumentum Integrated Sales & Service Widget v1.0 loaded');
+
   // ✅ Clear stored session when the browser/tab closes
   window.addEventListener('beforeunload', () => {
     try {
-      const id = (window.NeuroIQChat && window.NeuroIQChat.config && window.NeuroIQChat.config.customerId) || '';
+      const id = (window.MonumentumChat && window.MonumentumChat.config && window.MonumentumChat.config.customerId) || '';
       if (id) {
-        localStorage.removeItem(`neuroiq_session_${id}`);
+        localStorage.removeItem(`monumentum_session_${id}`);
       } else {
-        // Fallback: clear any NeuroIQ session keys if customerId isn't available
+        // Fallback: clear any Monumentum session keys if customerId isn't available
         for (let i = 0; i < localStorage.length; i++) {
           const k = localStorage.key(i);
-          if (k && k.startsWith('neuroiq_session_')) localStorage.removeItem(k);
+          if (k && k.startsWith('monumentum_session_')) localStorage.removeItem(k);
         }
       }
-      console.log('[NeuroIQChat] Session cleared on browser close');
+      console.log('[MonumentumChat] Session cleared on browser close');
     } catch (err) {
-      console.error('[NeuroIQChat] Error clearing session:', err);
+      console.error('[MonumentumChat] Error clearing session:', err);
     }
   });
 })();
-
-

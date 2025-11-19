@@ -3,7 +3,7 @@
   
   const NeuroIQChat = {
     config: {
-      webhookUrl: 'https://neuroiq.app.n8n.cloud/webhook/Monumentum-IB-Sales', //https://neuroiq.app.n8n.cloud/webhook/Monumentum-IB-Sales
+      webhookUrl: 'https://neuroiq.app.n8n.cloud/webhook/Integrated_Agent', // Integrated agent endpoint
       customerId: null,
       position: 'bottom-right',
       primaryColor: '#0066cc',
@@ -51,6 +51,7 @@
       
       return sessionId;
     },
+
     
     injectStyles: function() {
       const styles = `
@@ -265,29 +266,27 @@
       `;
       
       // Chat window
-      const window = document.createElement('div');
-      window.id = 'neuroiq-chat-window';
-      window.innerHTML = `
-        <div id="neuroiq-chat-header">
-          <strong>Chat with Us</strong>
-          <button id="neuroiq-chat-close" style="background:none;border:none;color:white;font-size:24px;cursor:pointer;line-height:1;padding:0;width:30px;height:30px;" aria-label="Close chat">×</button>
-        </div>
-        <div id="neuroiq-chat-messages">
-          <div class="neuroiq-message assistant">${this.config.greeting}</div>
-        </div>
-        <div class="neuroiq-typing">
-          <span></span><span></span><span></span>
-        </div>
-        <div id="neuroiq-chat-input-container">
-          <input type="text" id="neuroiq-chat-input" placeholder="Type your message..." aria-label="Chat message" />
-          <button id="neuroiq-chat-send" aria-label="Send message">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="22" y1="2" x2="11" y2="13"></line>
-              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-            </svg>
-          </button>
-        </div>
-      `;
+   const window = document.createElement('div');
+  window.id = 'neuroiq-chat-window';
+  window.innerHTML = `
+    <div id="neuroiq-chat-header">
+      <strong>Chat with Us</strong>
+      <button id="neuroiq-chat-close" style="background:none;border:none;color:white;font-size:24px;cursor:pointer;line-height:1;padding:0;width:30px;height:30px;" aria-label="Close chat">×</button>
+    </div>
+    <div id="neuroiq-chat-messages"></div>
+    <div class="neuroiq-typing">
+      <span></span><span></span><span></span>
+    </div>
+    <div id="neuroiq-chat-input-container">
+      <input type="text" id="neuroiq-chat-input" placeholder="Type your message..." aria-label="Chat message" />
+      <button id="neuroiq-chat-send" aria-label="Send message">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+      </button>
+    </div>
+  `;
       
       document.body.appendChild(button);
       document.body.appendChild(window);
@@ -307,17 +306,26 @@ attachEventListeners: function() {
   });
 },
     
-    toggleChat: function() {
-      const window = document.getElementById('neuroiq-chat-window');
-      this.chatOpen = !this.chatOpen;
-      
-      if (this.chatOpen) {
-        window.classList.add('open');
-        document.getElementById('neuroiq-chat-input').focus();
-      } else {
-        window.classList.remove('open');
-      }
-    },
+toggleChat: function() {
+  const window = document.getElementById('neuroiq-chat-window');
+  this.chatOpen = !this.chatOpen;
+
+  if (this.chatOpen) {
+    window.classList.add('open');
+    document.getElementById('neuroiq-chat-input').focus();
+
+    // ✅ SHOW INITIAL BUSINESS GREETING ON FIRST OPEN
+    if (this.history.length === 0) {
+      const greeting =
+        this.config.businessGreeting ||
+        "Hi there! How can I help you today?";
+      this.addMessage(greeting, 'assistant');
+    }
+
+  } else {
+    window.classList.remove('open');
+  }
+},
     
     sendMessage: function() {
       const input = document.getElementById('neuroiq-chat-input');
@@ -338,7 +346,8 @@ attachEventListeners: function() {
       this.showTyping(true);
       
       // Send to webhook WITH HISTORY ✅
-      fetch(this.config.webhookUrl, {
+
+      /*fetch(this.config.webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -368,6 +377,11 @@ attachEventListeners: function() {
           this.addMessage(`✅ Lead captured${name}. We'll be in touch soon!`, 'system');
         }
         
+        // Show ticket created notification
+        if (data.hasTicket && data.ticketData) {
+          this.addMessage(`✅ Support ticket created. We'll get back to you soon!`, 'system');
+        }
+        
         // Show conversation completed notice
         if (data.conversationCompleted) {
           this.addMessage('🟢 Thank you! This conversation has been completed. Feel free to start a new chat if you have more questions.', 'system');
@@ -387,7 +401,60 @@ attachEventListeners: function() {
         input.disabled = false;
         sendBtn.disabled = false;
         input.focus();
-      });
+      });*/
+    
+      //New fetch
+    fetch(this.config.webhookUrl, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    customerId: this.config.customerId,
+    sessionId: this.sessionId,
+    message: message,
+    history: this.history
+  })
+})
+.then(async res => {
+  if (!res.ok) throw new Error('Network response was not ok');
+  const text = await res.text();
+  try { return JSON.parse(text); }
+  catch { return { message: text }; }
+})
+.then(data => {
+  this.showTyping(false);
+
+  const reply = data.message || 'Sorry, I didn\'t understand that.';
+  this.addMessage(reply, 'assistant');
+
+  this.history.push({ role: 'user', content: message });
+  this.history.push({ role: 'assistant', content: reply });
+
+  if (data.hasLead && data.leadData) {
+    const name = data.leadData.name ? ` for ${data.leadData.name}` : '';
+    this.addMessage(`✅ Lead captured${name}. We'll be in touch soon!`, 'system');
+  }
+
+  if (data.hasTicket && data.ticketData) {
+    this.addMessage(`✅ Support ticket created. We'll get back to you soon!`, 'system');
+  }
+
+  if (data.conversationCompleted) {
+    this.addMessage('🟢 Thank you! This conversation has been completed. Feel free to start a new chat if you have more questions.', 'system');
+  }
+
+  input.disabled = false;
+  sendBtn.disabled = false;
+  input.focus();
+})
+.catch(err => {
+  this.showTyping(false);
+  this.addMessage('Sorry, something went wrong. Please try again.', 'assistant');
+  console.error('Chat error:', err);
+  input.disabled = false;
+  sendBtn.disabled = false;
+  input.focus();
+});
+  
     },
     
     addMessage: function(text, role) {
@@ -420,8 +487,8 @@ attachEventListeners: function() {
   window.NeuroIQChat = NeuroIQChat;
   
   // Log version for debugging
-  console.log('NeuroIQ Chat Widget v1.0 loaded');
-  
+  console.log('NeuroIQ Integrated Sales & Service Widget v1.0 loaded');
+
   // ✅ Clear stored session when the browser/tab closes
   window.addEventListener('beforeunload', () => {
     try {
@@ -441,5 +508,3 @@ attachEventListeners: function() {
     }
   });
 })();
-
-

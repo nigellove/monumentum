@@ -3,7 +3,7 @@
   
   const NeuroIQChat = {
     config: {
-      webhookUrl: 'https://neuroiq.app.n8n.cloud/webhook/Monumentum-IB-Sales', //https://neuroiq.app.n8n.cloud/webhook/Monumentum-IB-Sales
+      webhookUrl: 'https://neuroiq.app.n8n.cloud/webhook/lead-intake', //https://neuroiq.app.n8n.cloud/webhook/lead-intake
       customerId: null,
       position: 'bottom-right',
       primaryColor: '#0066cc',
