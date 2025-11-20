@@ -21,7 +21,7 @@ export default function ChatWidget({ isOpen, onClose }: ChatWidgetProps) {
   const [history, setHistory] = useState<any[]>([]);
   const [memoryKey, setMemoryKey] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const apiUrl = "https://neuroiq.app.n8n.cloud/webhook/Monumentum-Lead-Gen-Homepage";
+  const apiUrl = "https://monumentum.app.n8n.cloud/webhook/sales-agent7";
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
