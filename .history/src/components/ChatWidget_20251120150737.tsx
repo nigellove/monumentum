@@ -44,7 +44,7 @@ export default function ChatWidget({ isOpen, onClose }: ChatWidgetProps) {
       const res = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({agentType: "homepage", message: text, history, memoryKey })
+        body: JSON.stringify({ message: text, history, memoryKey })
       });
       const data = await res.json();
 
