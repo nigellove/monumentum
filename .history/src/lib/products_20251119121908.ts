@@ -48,12 +48,12 @@ export const PRODUCTS: Product[] = [
     stripeLink: 'https://buy.stripe.com/fZu8wPgUO8KE6ZO1OBdby01'
   },
   {
- id: 'integrated_agent',
-  name: 'Integrated Inbound Sales, Lead Capture and Customer Service Agent',
-  price: 15.99,
-  priceId: 'price_1SVJvtHNpNXABf4q5RrmEK04',  // ← NEW
-  billingCycle: 'monthly',
-  description: 'Complete solution combining sales, lead capture, and customer service',
+    id: 'integrated_agent',
+    name: 'Integrated Inbound Sales, Lead Capture and Customer Service Agent',
+    price: 15.99,
+    priceId: 'price_1SSLOhHNpNXABf4qvamXT6f8',
+    billingCycle: 'monthly',
+    description: 'Complete solution combining sales, lead capture, and customer service',
     features: [
       'All Sales Agent features',
       'All Customer Service features',
@@ -64,7 +64,7 @@ export const PRODUCTS: Product[] = [
       'Comprehensive analytics',
       'Native multi-language support'
     ],
-    stripeLink: 'https://buy.stripe.com/9B6bJ16ga6Cwesg1OBdby03'  // ← NEW
+    stripeLink: 'https://buy.stripe.com/3cIdR97kegd697Wal7dby02'
   }
 ];
 
