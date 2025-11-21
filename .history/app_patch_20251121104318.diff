@@ -1,0 +1,81 @@
+diff --git a/src/App.tsx b/src/App.tsx
+index 1111111..2222222 100644
+--- a/src/App.tsx
++++ b/src/App.tsx
+@@ -1,6 +1,6 @@
+ function AppContent() {
+-  const { user } = useAuth();
++  const { user, loading } = useAuth();
+@@
+   // PRIORITY 1: Check for password recovery token FIRST (before anything else)
+   useEffect(() => {
+@@
+   }, []);
+ 
+-  // PRIORITY 2: Check for payment success AFTER recovery check
+-  useEffect(() => {
+-    // Don't check payment success if we're in recovery mode
+-    if (isResetPasswordOpen) {
+-      return;
+-    }
+-
+-    const params = new URLSearchParams(window.location.search);
+-    const paymentSuccess = params.get('payment_success');
+-    const sessionId = params.get('session_id');
+-    
+-    if (paymentSuccess === 'true' && sessionId) {
+-      console.log('Payment success detected, opening PaymentSuccess modal');
+-      setIsPaymentSuccessOpen(true);
+-      setHasAccess(true); // Grant access immediately after payment
+-    }
+-  }, [isResetPasswordOpen]);
++  // PRIORITY 2: Check for payment success AFTER auth is loaded & session known
++  useEffect(() => {
++    if (loading) return;            // Wait for session restore
++    if (!user) return;             // Must have a user before processing Stripe returns
++    if (isResetPasswordOpen) return; // Recovery flow priority
++
++    const params = new URLSearchParams(window.location.search);
++    const paymentSuccess = params.get('payment_success');
++    const sessionId = params.get('session_id');
++
++    if (paymentSuccess === 'true' && sessionId) {
++      console.log('Payment success detected, opening PaymentSuccess modal');
++      setIsPaymentSuccessOpen(true);
++      setHasAccess(true);
++    }
++  }, [loading, user, isResetPasswordOpen]);
+@@
+   // PRIORITY 3: Check for beta access (only if NOT doing password reset or payment success)
+   useEffect(() => {
+-    // Don't check beta access if we're in recovery mode or payment success
+-    if (isResetPasswordOpen || isPaymentSuccessOpen) {
+-      return;
+-    }
+-
+-    const access = localStorage.getItem('beta_access');
+-    if (access === 'granted') {
+-      setHasAccess(true);
+-    }
+-  }, [isResetPasswordOpen, isPaymentSuccessOpen]);
++    if (loading) return;
++    if (isResetPasswordOpen || isPaymentSuccessOpen) return;
++
++    const access = localStorage.getItem('beta_access');
++    if (access === 'granted') {
++      setHasAccess(true);
++    }
++  }, [loading, isResetPasswordOpen, isPaymentSuccessOpen]);
+@@
+   // Show loading while checking for recovery token
+-  if (isCheckingRecovery) {
++  if (loading || isCheckingRecovery) {
+     return (
+       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+         <div className="text-center">
+@@
+   // THIRD PRIORITY: Show beta access gate if needed
+-  if (!hasAccess) {
++  if (!loading && !hasAccess) {
+     return <AccessGate onAccessGranted={handleAccessGranted} />;
+   }
