@@ -3,7 +3,7 @@
   
   const MonumentumChat = {
     config: {
-      webhookUrl: 'https://nkwmfqbuhvtloihbrwef.supabase.co/functions/v1/agent', // Customer Service endpoint
+      webhookUrl: 'https://nkwmfqbuhvtloihbrwef.supabase.co/functions/v1/agent',
       customerId: null,
       position: 'bottom-right',
       primaryColor: '#0066cc',
@@ -269,7 +269,7 @@
       window.id = 'monumentum-chat-window';
       window.innerHTML = `
         <div id="monumentum-chat-header">
-          <strong>Customer Support</strong>
+          <strong>Chat with Us</strong>
           <button id="monumentum-chat-close" style="background:none;border:none;color:white;font-size:24px;cursor:pointer;line-height:1;padding:0;width:30px;height:30px;" aria-label="Close chat">×</button>
         </div>
         <div id="monumentum-chat-messages">
@@ -342,7 +342,6 @@ attachEventListeners: function() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          agentType: "service",   
           customerId: this.config.customerId,
           sessionId: this.sessionId,
           message: message,
@@ -363,9 +362,10 @@ attachEventListeners: function() {
         this.history.push({ role: 'user', content: message });
         this.history.push({ role: 'assistant', content: reply });
         
-        // Show ticket created notification
-        if (data.hasTicket && data.ticketData) {
-          this.addMessage(`✅ Support ticket created. We'll get back to you soon!`, 'system');
+        // Show lead captured notification
+        if (data.hasLead && data.leadData) {
+          const name = data.leadData.name ? ` for ${data.leadData.name}` : '';
+          this.addMessage(`✅ Lead captured${name}. We'll be in touch soon!`, 'system');
         }
         
         // Show conversation completed notice
@@ -420,7 +420,8 @@ attachEventListeners: function() {
   window.MonumentumChat = MonumentumChat;
   
   // Log version for debugging
-  console.log('Monumentum Customer Service Widget v1.0 loaded');
+  console.log('Monumentum Chat Widget v1.0 loaded');
+  
   // ✓ Clear stored session when the browser/tab closes
   window.addEventListener('beforeunload', () => {
     try {

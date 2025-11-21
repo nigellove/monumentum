@@ -342,7 +342,6 @@ attachEventListeners: function() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          agentType: "service",   
           customerId: this.config.customerId,
           sessionId: this.sessionId,
           message: message,
