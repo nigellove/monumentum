@@ -401,12 +401,12 @@ useEffect(() => {
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl max-w-4xl w-full shadow-2xl overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-teal-600 to-cyan-600 text-white px-8 py-6">
+          <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-6">
             <div className="flex items-center gap-3 mb-2">
               <CheckCircle className="w-8 h-8" />
               <h1 className="text-3xl font-bold">Payment Successful!</h1>
             </div>
-            <p className="text-teal-100 text-lg">
+            <p className="text-purple-100 text-lg">
               Your account is being set up automatically
             </p>
           </div>
@@ -444,7 +444,7 @@ useEffect(() => {
                     type="text"
                     value={businessName}
                     onChange={(e) => setBusinessName(e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none transition-colors"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors"
                     placeholder="Acme Home Services"
                     required
                   />
@@ -460,7 +460,7 @@ useEffect(() => {
                     type="text"
                     value={businessAddress}
                     onChange={(e) => setBusinessAddress(e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none transition-colors"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors"
                     placeholder="123 Main St, City, State 12345"
                     required
                   />
@@ -476,7 +476,7 @@ useEffect(() => {
                     type="email"
                     value={businessEmail}
                     onChange={(e) => setBusinessEmail(e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none transition-colors"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors"
                     placeholder="contact@acmehomeservices.com"
                   />
                   <p className="text-xs text-gray-500 mt-1">
@@ -493,7 +493,7 @@ useEffect(() => {
                   <textarea
                     value={businessDescription}
                     onChange={(e) => setBusinessDescription(e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none transition-colors resize-none"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors resize-none"
                     placeholder="Describe your business, services, and what makes you unique..."
                     rows={4}
                   />
@@ -503,9 +503,9 @@ useEffect(() => {
                 </div>
 
                 {/* Optional Configuration Fields Section */}
-                <div className="bg-teal-50 p-4 rounded-lg border border-teal-200">
-                  <h4 className="text-sm font-semibold text-teal-900 mb-4">Optional: AI Agent Configuration</h4>
-                  <p className="text-xs text-teal-700 mb-4">These fields help customize your AI agent's behavior. You can update them later in your dashboard.</p>
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                  <h4 className="text-sm font-semibold text-blue-900 mb-4">Optional: AI Agent Configuration</h4>
+                  <p className="text-xs text-blue-700 mb-4">These fields help customize your AI agent's behavior. You can update them later in your dashboard.</p>
                   
                   {/* Website URL */}
                   <div className="mb-4">
@@ -516,7 +516,7 @@ useEffect(() => {
                       type="url"
                       value={websiteUrl}
                       onChange={(e) => setWebsiteUrl(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-teal-500 focus:outline-none text-sm"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none text-sm"
                       placeholder="https://example.com"
                     />
                   </div>
@@ -530,7 +530,7 @@ useEffect(() => {
                       type="tel"
                       value={contactPhone}
                       onChange={(e) => setContactPhone(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-teal-500 focus:outline-none text-sm"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none text-sm"
                       placeholder="+1 (555) 123-4567"
                     />
                   </div>
@@ -544,7 +544,7 @@ useEffect(() => {
                       type="text"
                       value={businessHours}
                       onChange={(e) => setBusinessHours(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-teal-500 focus:outline-none text-sm"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none text-sm"
                       placeholder="Mon-Fri 9AM-5PM, Sat 10AM-2PM"
                     />
                   </div>
@@ -558,7 +558,7 @@ useEffect(() => {
                       type="text"
                       value={personalizedGreeting}
                       onChange={(e) => setPersonalizedGreeting(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-teal-500 focus:outline-none text-sm"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none text-sm"
                       placeholder="Welcome to our business!"
                     />
                   </div>
@@ -571,7 +571,7 @@ useEffect(() => {
                     <select
                       value={tone}
                       onChange={(e) => setTone(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-teal-500 focus:outline-none text-sm"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none text-sm"
                     >
                       <option value="friendly">Friendly</option>
                       <option value="formal">Formal</option>
@@ -590,7 +590,7 @@ useEffect(() => {
                     <select
                       value={language}
                       onChange={(e) => setLanguage(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-teal-500 focus:outline-none text-sm"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none text-sm"
                     >
                       <option value="en">English</option>
                       <option value="es">Spanish</option>
@@ -610,7 +610,7 @@ useEffect(() => {
                       type="text"
                       value={additionalFields}
                       onChange={(e) => setAdditionalFields(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-teal-500 focus:outline-none text-sm"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none text-sm"
                       placeholder="Company size, Industry, Timeline (comma-separated)"
                     />
                   </div>
@@ -623,7 +623,7 @@ useEffect(() => {
                     <select
                       value={followUpType}
                       onChange={(e) => setFollowUpType(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-teal-500 focus:outline-none text-sm"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none text-sm"
                     >
                       <option value="email_summary">Email Summary</option>
                       <option value="calendly_link">Calendly Link</option>
@@ -645,7 +645,7 @@ useEffect(() => {
                       type="text"
                       value={followUpData}
                       onChange={(e) => setFollowUpData(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-teal-500 focus:outline-none text-sm"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none text-sm"
                       placeholder={followUpType?.includes('link') || followUpType?.includes('calendly') || followUpType?.includes('zoom') || followUpType?.includes('meets') || followUpType?.includes('teams') ? 'https://...' : 'Your custom message or data'}
                     />
                   </div>
@@ -660,7 +660,7 @@ useEffect(() => {
                   <select
                     value={platform}
                     onChange={(e) => setPlatform(e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none transition-colors"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors"
                   >
                     <option value="html">HTML/Custom Website</option>
                     {/*<option value="shopify">Shopify</option>
@@ -670,9 +670,9 @@ useEffect(() => {
 
                 {/* Policy Section (CS/Integrated only) */}
                 {needsPolicySection && (
-                  <div className="border-2 border-teal-200 rounded-lg p-6 bg-teal-50">
+                  <div className="border-2 border-purple-200 rounded-lg p-6 bg-purple-50">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                      <FileCheck className="w-5 h-5 text-teal-600" />
+                      <FileCheck className="w-5 h-5 text-purple-600" />
                       Customer Service Policy
                     </h3>
                     
@@ -684,7 +684,7 @@ useEffect(() => {
                         <select
                           value={selectedTemplate}
                           onChange={(e) => setSelectedTemplate(e.target.value)}
-                          className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none transition-colors"
+                          className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors"
                           required={needsPolicySection}
                         >
                           <option value="">Choose a template...</option>
@@ -710,7 +710,7 @@ useEffect(() => {
       <textarea
         value={policyContent}
         onChange={(e) => setPolicyContent(e.target.value)}
-        className="w-full h-48 p-3 border-2 border-slate-200 rounded-lg focus:border-teal-500 focus:outline-none font-mono text-sm"
+        className="w-full h-48 p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none font-mono text-sm"
         placeholder="Edit your policy here..."
       />
     )}
@@ -724,7 +724,7 @@ useEffect(() => {
     </p>
     <a 
       href="mailto:support@monumentum.ai?subject=Custom Integration Request"
-      className="inline-block px-4 py-2 bg-teal-600 text-white rounded-lg font-semibold hover:bg-teal-700 transition-colors"
+      className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
     >
       Contact Us for Custom Build
     </a>
@@ -736,7 +736,7 @@ useEffect(() => {
                             type="checkbox"
                             checked={acceptedLiability}
                             onChange={(e) => setAcceptedLiability(e.target.checked)}
-                            className="mt-1 w-4 h-4 text-teal-600 flex-shrink-0"
+                            className="mt-1 w-4 h-4 text-purple-600 flex-shrink-0"
                             required={needsPolicySection}
                           />
                           <span className="text-sm text-gray-700">
@@ -755,7 +755,7 @@ useEffect(() => {
                       type="checkbox"
                       checked={acceptedTerms}
                       onChange={(e) => setAcceptedTerms(e.target.checked)}
-                      className="mt-1 w-4 h-4 text-teal-600 flex-shrink-0"
+                      className="mt-1 w-4 h-4 text-purple-600 flex-shrink-0"
                       required
                     />
                     <span className="text-sm text-gray-700">
@@ -764,7 +764,7 @@ useEffect(() => {
                         href="/docs/termsofservice.html"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-teal-600 hover:underline font-semibold"
+                        className="text-purple-600 hover:underline font-semibold"
                       >
                         Terms of Service
                       </a>
@@ -777,7 +777,7 @@ useEffect(() => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="flex-1 bg-gradient-to-r from-teal-600 to-cyan-600 text-white py-3 rounded-lg font-bold hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-lg font-bold hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loading ? (
                       <>
@@ -828,15 +828,15 @@ useEffect(() => {
                 
                 <div className="space-y-4">
                   {/* Step 1: Check Email */}
-                  <div className="flex gap-4 p-4 bg-teal-50 border border-teal-200 rounded-lg">
+                  <div className="flex gap-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     <div className="flex-shrink-0">
-                      <div className="bg-teal-500 rounded-full w-8 h-8 flex items-center justify-center text-white font-bold">
+                      <div className="bg-blue-500 rounded-full w-8 h-8 flex items-center justify-center text-white font-bold">
                         1
                       </div>
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <Mail className="w-5 h-5 text-teal-600" />
+                        <Mail className="w-5 h-5 text-blue-600" />
                         <h3 className="font-semibold text-gray-900">Check Your Email</h3>
                       </div>
                       <p className="text-gray-700 mb-2">
@@ -855,15 +855,15 @@ useEffect(() => {
                   </div>
 
                   {/* Step 2: Install Widget */}
-                  <div className="flex gap-4 p-4 bg-teal-50 border border-teal-200 rounded-lg">
+                  <div className="flex gap-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
                     <div className="flex-shrink-0">
-                      <div className="bg-teal-600 rounded-full w-8 h-8 flex items-center justify-center text-white font-bold">
+                      <div className="bg-purple-500 rounded-full w-8 h-8 flex items-center justify-center text-white font-bold">
                         2
                       </div>
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <Code className="w-5 h-5 text-teal-600" />
+                        <Code className="w-5 h-5 text-purple-600" />
                         <h3 className="font-semibold text-gray-900">Install Your Widget</h3>
                       </div>
                       <p className="text-gray-700 mb-2">
@@ -891,7 +891,7 @@ useEffect(() => {
                       </p>
                       <button
                         onClick={() => window.location.href = '/dashboard'}
-                        className="bg-gradient-to-r from-teal-600 to-cyan-600 text-white px-6 py-2 rounded-lg font-medium hover:from-teal-700 hover:to-cyan-700 transition-all"
+                        className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-2 rounded-lg font-medium hover:from-purple-700 hover:to-indigo-700 transition-all"
                       >
                         Go to Dashboard →
                       </button>
@@ -931,7 +931,7 @@ useEffect(() => {
               {setupComplete && (
                 <>
                   Didn't receive the email? Check your spam folder or{' '}
-                  <button className="text-teal-600 hover:underline">
+                  <button className="text-purple-600 hover:underline">
                     resend it
                   </button>
                 </>
