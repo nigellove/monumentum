@@ -97,7 +97,7 @@ export default function SignUp({ onClose, onSwitchToSignIn }: SignUpProps) {
             .from('business_profiles')
             .select('customer_id')
             .eq('user_id', data.user.id)
-            .maybeSingle();
+            .single();
 
           if (profileError && profileError.code !== 'PGRST116') {
             console.error('Error checking existing profile:', profileError);
@@ -133,6 +133,7 @@ export default function SignUp({ onClose, onSwitchToSignIn }: SignUpProps) {
               email: email,
               product_id: selectedProduct.id,
               product_name: selectedProduct.name,
+              customer_id: existingCustomerId,
               business_name: businessName
             });
 
@@ -151,6 +152,7 @@ export default function SignUp({ onClose, onSwitchToSignIn }: SignUpProps) {
               productId: selectedProduct.id,
               productName: selectedProduct.name,
               productPrice: selectedProduct.price,
+              customerId: existingCustomerId,
               timestamp: new Date().toISOString(),
             })
           );
