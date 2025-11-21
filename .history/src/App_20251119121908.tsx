@@ -26,7 +26,7 @@ import { useAuth } from './contexts/AuthContext'
 import { supabase } from './lib/supabase'
 
 function AppContent() {
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   const [hasAccess, setHasAccess] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
@@ -78,34 +78,35 @@ function AppContent() {
   }, []);
 
   // PRIORITY 2: Check for payment success AFTER recovery check
-useEffect(() => {
-  // Only process Stripe success *after auth session exists*
-  if (loading) return;
-  if (!user) return;
-  if (isResetPasswordOpen) return;
+  useEffect(() => {
+    // Don't check payment success if we're in recovery mode
+    if (isResetPasswordOpen) {
+      return;
+    }
 
-  const params = new URLSearchParams(window.location.search);
-  const paymentSuccess = params.get('payment_success');
-  const sessionId = params.get('session_id');
-  
-  if (paymentSuccess === 'true' && sessionId) {
-    console.log('Payment success detected, opening PaymentSuccess modal');
-    setIsPaymentSuccessOpen(true);
-    setHasAccess(true);
-  }
-}, [loading, user, isResetPasswordOpen]);
+    const params = new URLSearchParams(window.location.search);
+    const paymentSuccess = params.get('payment_success');
+    const sessionId = params.get('session_id');
+    
+    if (paymentSuccess === 'true' && sessionId) {
+      console.log('Payment success detected, opening PaymentSuccess modal');
+      setIsPaymentSuccessOpen(true);
+      setHasAccess(true); // Grant access immediately after payment
+    }
+  }, [isResetPasswordOpen]);
 
   // PRIORITY 3: Check for beta access (only if NOT doing password reset or payment success)
-useEffect(() => {
-  if (loading) return;
-  if (isResetPasswordOpen || isPaymentSuccessOpen) return;
+  useEffect(() => {
+    // Don't check beta access if we're in recovery mode or payment success
+    if (isResetPasswordOpen || isPaymentSuccessOpen) {
+      return;
+    }
 
-  const access = localStorage.getItem('beta_access');
-  if (access === 'granted') {
-    setHasAccess(true);
-  }
-}, [loading, isResetPasswordOpen, isPaymentSuccessOpen]);
-
+    const access = localStorage.getItem('beta_access');
+    if (access === 'granted') {
+      setHasAccess(true);
+    }
+  }, [isResetPasswordOpen, isPaymentSuccessOpen]);
 
   const handleGetStarted = () => {
     setIsChatOpen(true);
@@ -168,7 +169,7 @@ useEffect(() => {
   };
 
   // Show loading while checking for recovery token
-  if (loading || isCheckingRecovery){
+  if (isCheckingRecovery) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
         <div className="text-center">
@@ -198,9 +199,9 @@ useEffect(() => {
   }
 
   // THIRD PRIORITY: Show beta access gate if needed
-  if (!loading && !hasAccess) {
-  return <AccessGate onAccessGranted={handleAccessGranted} />;
-}
+  if (!hasAccess) {
+    return <AccessGate onAccessGranted={handleAccessGranted} />;
+  }
 
   // NORMAL APP: Show full site after beta access granted
   return (

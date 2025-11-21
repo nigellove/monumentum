@@ -13,7 +13,7 @@ export default function SignUp({ onClose, onSwitchToSignIn }: SignUpProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [businessName, setBusinessName] = useState(''); // added business name
+  const [businessName, setBusinessName] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [error, setError] = useState('');
@@ -93,12 +93,11 @@ export default function SignUp({ onClose, onSwitchToSignIn }: SignUpProps) {
 
       if (data.user) {
         try {
-          // Check if returning customer using maybeSingle (no error if no row)
           const { data: existingProfiles, error: profileError } = await supabase
             .from('business_profiles')
             .select('customer_id')
             .eq('user_id', data.user.id)
-            .maybeSingle();
+            .single();
 
           if (profileError && profileError.code !== 'PGRST116') {
             console.error('Error checking existing profile:', profileError);
@@ -108,9 +107,7 @@ export default function SignUp({ onClose, onSwitchToSignIn }: SignUpProps) {
           }
 
           const existingCustomerId = existingProfiles?.customer_id || null;
-          console.log('Existing customer_id:', existingCustomerId);
 
-          // For NEW customers: Create placeholder business profile with pending status
           if (!existingCustomerId) {
             const { error: insertError } = await supabase
               .from('business_profiles')
@@ -118,7 +115,7 @@ export default function SignUp({ onClose, onSwitchToSignIn }: SignUpProps) {
                 user_id: data.user.id,
                 business_email: email,
                 business_name: businessName || 'Pending Setup',
-                payment_status: 'pending',
+                payment_status: 'pending'
               });
 
             if (insertError) {
@@ -129,7 +126,6 @@ export default function SignUp({ onClose, onSwitchToSignIn }: SignUpProps) {
             }
           }
 
-          // Store pending signup WITHOUT customer_id
           const { error: pendingError } = await supabase
             .from('pending_signups')
             .insert({
@@ -137,7 +133,8 @@ export default function SignUp({ onClose, onSwitchToSignIn }: SignUpProps) {
               email: email,
               product_id: selectedProduct.id,
               product_name: selectedProduct.name,
-              business_name: businessName,
+              customer_id: existingCustomerId,
+              business_name: businessName
             });
 
           if (pendingError) {
@@ -147,7 +144,6 @@ export default function SignUp({ onClose, onSwitchToSignIn }: SignUpProps) {
             return;
           }
 
-          // Local pending signup (no customerId – n8n owns that)
           localStorage.setItem(
             'pending_signup',
             JSON.stringify({
@@ -156,17 +152,12 @@ export default function SignUp({ onClose, onSwitchToSignIn }: SignUpProps) {
               productId: selectedProduct.id,
               productName: selectedProduct.name,
               productPrice: selectedProduct.price,
+              customerId: existingCustomerId,
               timestamp: new Date().toISOString(),
             })
           );
 
-          console.log(
-            '✅ Pending signup stored. Redirecting to Stripe:',
-            selectedProduct.stripeLink
-          );
-          const checkoutUrl = `${selectedProduct.stripeLink}?prefilled_email=${encodeURIComponent(
-            email
-          )}`;
+          const checkoutUrl = `${selectedProduct.stripeLink}?prefilled_email=${encodeURIComponent(email)}`;
           window.location.href = checkoutUrl;
         } catch (err: any) {
           console.error('Signup error:', err);
@@ -204,7 +195,6 @@ export default function SignUp({ onClose, onSwitchToSignIn }: SignUpProps) {
               </div>
             )}
 
-            {/* Business Name */}
             <div>
               <label htmlFor="businessName" className="block text-sm font-semibold text-slate-700 mb-2">
                 Business Name
@@ -214,13 +204,12 @@ export default function SignUp({ onClose, onSwitchToSignIn }: SignUpProps) {
                 type="text"
                 value={businessName}
                 onChange={(e) => setBusinessName(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors"
+                className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-teal-500 focus:outline-none transition-colors"
                 placeholder="Your company name"
                 required
               />
             </div>
 
-            {/* Email */}
             <div>
               <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-2">
                 Email Address
@@ -232,14 +221,13 @@ export default function SignUp({ onClose, onSwitchToSignIn }: SignUpProps) {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors"
+                  className="w-full pl-11 pr-4 py-3 border-2 border-slate-200 rounded-lg focus:border-teal-500 focus:outline-none transition-colors"
                   placeholder="you@company.com"
                   required
                 />
               </div>
             </div>
 
-            {/* Password */}
             <div>
               <label htmlFor="password" className="block text-sm font-semibold text-slate-700 mb-2">
                 Password
@@ -251,7 +239,7 @@ export default function SignUp({ onClose, onSwitchToSignIn }: SignUpProps) {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors"
+                  className="w-full pl-11 pr-4 py-3 border-2 border-slate-200 rounded-lg focus:border-teal-500 focus:outline-none transition-colors"
                   placeholder="Create a strong password"
                   required
                 />
@@ -261,7 +249,6 @@ export default function SignUp({ onClose, onSwitchToSignIn }: SignUpProps) {
               </p>
             </div>
 
-            {/* Confirm Password */}
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-semibold text-slate-700 mb-2">
                 Confirm Password
@@ -273,14 +260,13 @@ export default function SignUp({ onClose, onSwitchToSignIn }: SignUpProps) {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors"
+                  className="w-full pl-11 pr-4 py-3 border-2 border-slate-200 rounded-lg focus:border-teal-500 focus:outline-none transition-colors"
                   placeholder="Confirm your password"
                   required
                 />
               </div>
             </div>
 
-            {/* Product Selection */}
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-3">
                 Choose Your Plan
@@ -289,7 +275,7 @@ export default function SignUp({ onClose, onSwitchToSignIn }: SignUpProps) {
                 {PRODUCTS.map((product) => (
                   <label
                     key={product.id}
-                    className="flex items-start p-4 border-2 border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50"
+                    className="flex items-start p-4 border-2 border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors has-[:checked]:border-teal-500 has-[:checked]:bg-teal-50"
                   >
                     <input
                       type="radio"
@@ -297,50 +283,49 @@ export default function SignUp({ onClose, onSwitchToSignIn }: SignUpProps) {
                       value={product.id}
                       checked={selectedProduct?.id === product.id}
                       onChange={() => setSelectedProduct(product)}
-                      className="mt-1 mr-3 w-4 h-4 text-blue-600"
+                      className="mt-1 mr-3 w-4 h-4 text-teal-600"
                       required
                     />
                     <div className="flex-1">
                       <div className="font-semibold text-slate-900">{product.name}</div>
                       <div className="text-sm text-slate-600 mb-2">{product.description}</div>
-                      <div className="text-lg font-bold text-blue-600">
+                      <div className="text-lg font-bold text-teal-600">
                         ${product.price}/{product.billingCycle}
                       </div>
                     </div>
                     {selectedProduct?.id === product.id && (
-                      <Check className="text-blue-600 flex-shrink-0" size={20} />
+                      <Check className="text-teal-600 flex-shrink-0" size={20} />
                     )}
                   </label>
                 ))}
               </div>
             </div>
 
-            {/* Terms */}
             <div className="bg-slate-50 border-2 border-slate-200 rounded-lg p-4">
               <label className="flex items-start gap-3 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={acceptedTerms}
                   onChange={(e) => setAcceptedTerms(e.target.checked)}
-                  className="mt-1 w-4 h-4 text-blue-600 flex-shrink-0"
+                  className="mt-1 w-4 h-4 text-teal-600 flex-shrink-0"
                   required
                 />
                 <span className="text-sm text-slate-700">
-                  I agree to NeuroIQ&apos;s{' '}
+                  I agree to Monumentum's{' '}
                   <a
                     href="/docs/termsofservice.html"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline font-semibold"
+                    className="text-teal-600 hover:underline font-semibold"
                   >
                     Terms of Service
                   </a>
                   {' '}and{' '}
-                  <a
-                    href="/docs/privacy.html"
+                  
+                   <a href="/docs/privacy.html"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline font-semibold"
+                    className="text-teal-600 hover:underline font-semibold"
                   >
                     Privacy Policy
                   </a>
@@ -348,11 +333,10 @@ export default function SignUp({ onClose, onSwitchToSignIn }: SignUpProps) {
               </label>
             </div>
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 rounded-lg font-bold text-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-teal-500 to-teal-600 text-white py-4 rounded-lg font-bold text-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <>
@@ -369,13 +353,12 @@ export default function SignUp({ onClose, onSwitchToSignIn }: SignUpProps) {
             Already have an account?{' '}
             <button 
               onClick={onSwitchToSignIn} 
-              className="text-blue-600 font-semibold hover:underline"
+              className="text-teal-600 font-semibold hover:underline"
             >
               Sign In
             </button>
           </div>
 
-          {/* Security Badge */}
           <div className="mt-6 text-center">
             <p className="text-xs text-slate-500">
               🔒 Secured by Stripe • Your information is encrypted
