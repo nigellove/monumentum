@@ -367,7 +367,8 @@ toggleChat: function() {
   this.showTyping(false);
 
   const reply = data.message || 'Sorry, I didn\'t understand that.';
-  this.addMessage(reply, 'assistant');
+  //this.addMessage(reply, 'assistant');
+  this.addMessage(reply, 'assistant', data.buttons);
 
   this.history.push({ role: 'user', content: message });
   this.history.push({ role: 'assistant', content: reply });
@@ -399,7 +400,7 @@ toggleChat: function() {
 });
     },
     
-    addMessage: function(text, role) {
+   /* addMessage: function(text, role) {
       const messagesContainer = document.getElementById('monumentum-chat-messages');
       const messageDiv = document.createElement('div');
       messageDiv.className = `monumentum-message ${role}`;
@@ -413,7 +414,30 @@ toggleChat: function() {
       messageDiv.innerHTML = linkedText;
       messagesContainer.appendChild(messageDiv);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    },
+    },*/
+
+ addMessage: function(text, role, buttons) {
+  const messagesContainer = document.getElementById('monumentum-chat-messages');
+  const messageDiv = document.createElement('div');
+  messageDiv.className = `monumentum-message ${role}`;
+  messageDiv.innerHTML = text;
+  messagesContainer.appendChild(messageDiv);
+  
+  if (buttons && buttons.length > 0) {
+    buttons.forEach((btn) => {
+      const button = document.createElement('button');
+      button.style.cssText = 'padding: 8px 16px; background: #0066cc; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 4px;';
+      button.innerHTML = btn.label;
+      button.onclick = () => {
+        document.getElementById('monumentum-chat-input').value = btn.value;
+        this.sendMessage();
+      };
+      messagesContainer.appendChild(button);
+    });
+  }
+  
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+},
     
     showTyping: function(show) {
       const typing = document.querySelector('.monumentum-typing');
