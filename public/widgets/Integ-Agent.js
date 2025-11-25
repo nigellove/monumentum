@@ -369,7 +369,9 @@ toggleChat: function() {
   const reply = data.message ?? data.answer ?? data.text ?? 'Sorry, I didn\'t understand that.';
 
   //this.addMessage(reply, 'assistant');
-  this.addMessage(reply, 'assistant', data.buttons);
+  //this.addMessage(reply, 'assistant', data.buttons);
+  this.addMessage(reply.trim(), 'assistant', data.buttons);
+
 
   this.history.push({ role: 'user', content: message });
   this.history.push({ role: 'assistant', content: reply });
