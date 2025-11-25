@@ -363,14 +363,18 @@ toggleChat: function() {
   try { return JSON.parse(text); }
   catch { return { message: text }; }
 })
+
 .then(data => {
   this.showTyping(false);
 
-  const reply = data.message ?? data.answer ?? data.text ?? 'Sorry, I didn\'t understand that.';
+  const response = Array.isArray(data) ? data[0] : data;
+  const reply = response.message ?? response.answer ?? response.text ?? 'Sorry, I didn\'t understand that.';
+
+  this.addMessage(reply.trim(), 'assistant', response.buttons);
 
   //this.addMessage(reply, 'assistant');
   //this.addMessage(reply, 'assistant', data.buttons);
-  this.addMessage(reply.trim(), 'assistant', data.buttons);
+ // this.addMessage(reply.trim(), 'assistant', data.buttons);
 
 
   this.history.push({ role: 'user', content: message });
