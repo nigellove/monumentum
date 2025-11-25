@@ -367,17 +367,40 @@ toggleChat: function() {
 .then(data => {
   this.showTyping(false);
 
+  // Unwrap if it's an array
   const response = Array.isArray(data) ? data[0] : data;
+  
   const reply = response.message ?? response.answer ?? response.text ?? 'Sorry, I didn\'t understand that.';
 
   this.addMessage(reply.trim(), 'assistant', response.buttons);
+
+  this.history.push({ role: 'user', content: message });
+  this.history.push({ role: 'assistant', content: reply });
+
+  if (response.hasLead && response.leadData) {
+    const name = response.leadData.name ? ` for ${response.leadData.name}` : '';
+    this.addMessage(`✅ Lead captured${name}. We'll be in touch soon!`, 'system');
+  }
+
+  if (response.hasTicket && response.ticketData) {
+    this.addMessage(`✅ Support ticket created. We'll get back to you soon!`, 'system');
+  }
+
+  if (response.conversationCompleted) {
+    this.addMessage('🟢 Thank you! This conversation has been completed. Feel free to start a new chat if you have more questions.', 'system');
+  }
+
+  input.disabled = false;
+  sendBtn.disabled = false;
+  input.focus();
+})
 
   //this.addMessage(reply, 'assistant');
   //this.addMessage(reply, 'assistant', data.buttons);
  // this.addMessage(reply.trim(), 'assistant', data.buttons);
 
 
-  this.history.push({ role: 'user', content: message });
+  /*this.history.push({ role: 'user', content: message });
   this.history.push({ role: 'assistant', content: reply });
 
   if (data.hasLead && data.leadData) {
@@ -396,7 +419,8 @@ toggleChat: function() {
   input.disabled = false;
   sendBtn.disabled = false;
   input.focus();
-})
+})*/
+
 .catch(err => {
   this.showTyping(false);
   this.addMessage('Sorry, something went wrong. Please try again.', 'assistant');
