@@ -425,7 +425,7 @@ toggleChat: function() {
   
   if (buttons && buttons.length > 0) {
     buttons.forEach((btn) => {
-      const button = document.createElement('button');
+      const button = document.createElement('button');x``
       button.style.cssText = 'padding: 8px 16px; background: #0066cc; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 4px;';
       button.innerHTML = btn.label;
       button.onclick = () => {
