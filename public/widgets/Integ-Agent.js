@@ -366,7 +366,8 @@ toggleChat: function() {
 .then(data => {
   this.showTyping(false);
 
-  const reply = data.message || 'Sorry, I didn\'t understand that.';
+  const reply = data.message ?? data.answer ?? data.text ?? 'Sorry, I didn\'t understand that.';
+
   //this.addMessage(reply, 'assistant');
   this.addMessage(reply, 'assistant', data.buttons);
 
