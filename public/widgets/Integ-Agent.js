@@ -1,10 +1,9 @@
-(function() {
+(function () {
   'use strict';
 
-  // Monumentum chat widget with resilient response parsing for n8n/Supabase flows
   const MonumentumChat = {
     config: {
-      webhookUrl: 'https://nkwmfqbuhvtloihbrwef.supabase.co/functions/v1/agent',
+      webhookUrl: 'https://nkwmfqbuhvtloihbrwef.supabase.co/functions/v1/agent', // Supabase edge function
       customerId: null,
       position: 'bottom-right',
       primaryColor: '#0066cc',
@@ -15,22 +14,29 @@
     chatOpen: false,
     history: [],
 
-    init: function(userConfig) {
+    init: function (userConfig) {
+      // Merge user config
       Object.assign(this.config, userConfig);
 
+      // Validate customerId
       if (!this.config.customerId) {
         console.error('Monumentum: customerId is required');
         return;
       }
 
+      // Generate or retrieve sessionId
       this.sessionId = this.getOrCreateSession();
+
+      // Initialize history
       this.history = [];
+
+      // Inject CSS and UI
       this.injectStyles();
       this.createChatUI();
       this.attachEventListeners();
     },
 
-    getOrCreateSession: function() {
+    getOrCreateSession: function () {
       const storageKey = `monumentum_session_${this.config.customerId}`;
       let sessionId = localStorage.getItem(storageKey);
 
@@ -42,7 +48,7 @@
       return sessionId;
     },
 
-    injectStyles: function() {
+    injectStyles: function () {
       const styles = `
         #monumentum-chat-button {
           position: fixed;
@@ -132,14 +138,6 @@
           box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
 
-        .monumentum-message a {
-          color: #0066cc;
-          text-decoration: underline;
-          display: block;
-          margin: 8px 0;
-          word-break: break-all;
-        }
-
         .monumentum-message.system {
           background: #fff9e6;
           color: #856404;
@@ -147,6 +145,14 @@
           max-width: 90%;
           font-size: 13px;
           border: 1px solid #ffeaa7;
+        }
+
+        .monumentum-message a {
+          color: #0066cc;
+          text-decoration: underline;
+          display: block;
+          margin: 8px 0;
+          word-break: break-all;
         }
 
         #monumentum-chat-input-container {
@@ -243,7 +249,7 @@
       document.head.appendChild(styleSheet);
     },
 
-    createChatUI: function() {
+    createChatUI: function () {
       const button = document.createElement('button');
       button.id = 'monumentum-chat-button';
       button.setAttribute('aria-label', 'Open chat');
@@ -279,21 +285,29 @@
       document.body.appendChild(windowEl);
     },
 
-    attachEventListeners: function() {
+    attachEventListeners: function () {
       const button = document.getElementById('monumentum-chat-button');
       const closeBtn = document.getElementById('monumentum-chat-close');
       const sendBtn = document.getElementById('monumentum-chat-send');
       const input = document.getElementById('monumentum-chat-input');
 
+      if (!button || !closeBtn || !sendBtn || !input) {
+        console.error('Monumentum: Chat UI elements not found');
+        return;
+      }
+
       button.addEventListener('click', () => this.toggleChat());
       closeBtn.addEventListener('click', () => this.toggleChat());
       sendBtn.addEventListener('click', () => this.sendMessage());
       input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') this.sendMessage();
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          this.sendMessage();
+        }
       });
     },
 
-    toggleChat: function() {
+    toggleChat: function () {
       const windowEl = document.getElementById('monumentum-chat-window');
       this.chatOpen = !this.chatOpen;
 
@@ -302,7 +316,10 @@
         document.getElementById('monumentum-chat-input').focus();
 
         if (this.history.length === 0) {
-          const greeting = this.config.businessGreeting || 'Hi there! How can I help you today?';
+          const greeting =
+            this.config.businessGreeting ||
+            this.config.greeting ||
+            'Hi there! How can I help you today?';
           this.addMessage(greeting, 'assistant');
         }
       } else {
@@ -310,7 +327,7 @@
       }
     },
 
-    buildPayload: function(message) {
+    buildPayload: function (message) {
       const conversationHistory = [...this.history, { role: 'user', content: message }];
       return {
         agentType: 'integrated',
@@ -321,95 +338,25 @@
       };
     },
 
-    parseResponse: function(raw) {
-      const tryJson = (value) => {
-        if (typeof value !== 'string') return value;
-        const trimmed = value.trim();
-        if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) return value;
-        try {
-          return JSON.parse(trimmed);
-        } catch (err) {
-          console.warn('Monumentum: could not parse stringified JSON response', err);
-          return value;
-        }
-      };
-
-      const unwrap = (value) => {
-        let current = value;
-        let hops = 0;
-
-        while (current && hops < 8) {
-          const maybeParsed = tryJson(current);
-          if (maybeParsed !== current) {
-            current = maybeParsed;
-            hops += 1;
-            continue;
-          }
-
-          if (Array.isArray(current)) {
-            current = current[0];
-            hops += 1;
-            continue;
-          }
-
-          if (
-            current &&
-            typeof current === 'object' &&
-            (current.data || current.response || current.json || current.body || current.result)
-          ) {
-            current = current.data ?? current.response ?? current.json ?? current.body ?? current.result;
-            hops += 1;
-            continue;
-          }
-
-          break;
-        }
-
-        return current;
-      };
-
-      const response = unwrap(raw) ?? {};
-      const textFields = ['message', 'answer', 'text', 'content'];
-
-      const message =
-        typeof response === 'string'
-          ? response.trim()
-          : textFields
-              .map((key) => (typeof response?.[key] === 'string' ? response[key].trim() : ''))
-              .find((val) => val);
-
-      const buttonSource = response?.buttons ?? response?.options ?? response?.actions ?? [];
-      const buttons = Array.isArray(buttonSource)
-        ? buttonSource
-            .map((btn) => ({
-              label: btn?.label || btn?.text || btn?.title || String(btn?.value ?? btn?.payload ?? ''),
-              value: btn?.value ?? btn?.payload ?? btn?.text ?? btn?.label ?? ''
-            }))
-            .filter((btn) => btn.label && btn.value)
-        : [];
-
-      return {
-        message: message || 'Sorry, I didn\'t understand that.',
-        buttons,
-        leadSubmitted: Boolean(response?.leadSubmitted || response?.hasLead),
-        leadData: response?.leadData || null,
-        ticketData: response?.ticketData || null,
-        conversationCompleted: Boolean(response?.conversationCompleted)
-      };
-    },
-
-        safeInterpret: function(data) {
+    safeInterpret: function (data) {
       try {
-        if (typeof data === "string") {
-          try { data = JSON.parse(data); } catch { return { message: data }; }
+        // If backend gave us a string, try to parse, else treat as a direct message
+        if (typeof data === 'string') {
+          try {
+            data = JSON.parse(data);
+          } catch (e) {
+            return { message: data };
+          }
         }
 
+        // If backend gave us an array, use the first element
         if (Array.isArray(data)) {
           data = data[0] || {};
         }
 
-        if (!data || typeof data !== "object") {
-          return { message: "Thanks, we'll follow up shortly." };
+        // If still not an object, fallback
+        if (!data || typeof data !== 'object') {
+          return { message: 'Thanks, we\'ll follow up shortly.' };
         }
 
         const msg =
@@ -427,14 +374,13 @@
           conversationCompleted: Boolean(data.conversationCompleted),
           buttons: Array.isArray(data.buttons) ? data.buttons : null
         };
-
       } catch (e) {
-        return { message: "Thanks — we'll follow up." };
+        console.error('Monumentum: safeInterpret error', e);
+        return { message: 'Thanks — we\'ll follow up.' };
       }
     },
 
-
-    sendMessage: function() {
+    sendMessage: function () {
       const input = document.getElementById('monumentum-chat-input');
       const sendBtn = document.getElementById('monumentum-chat-send');
       const message = input.value.trim();
@@ -447,42 +393,57 @@
       input.value = '';
       this.showTyping(true);
 
-
-      console.log("HISTORY SERIALIZABLE?", !!JSON.stringify(this.history));
+      const payload = this.buildPayload(message);
 
       fetch(this.config.webhookUrl, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify(this.buildPayload(message))
-})
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error('Network response was not ok');
+          return res.json();
+        })
+        .then((data) => {
+          this.showTyping(false);
 
+          const response = this.safeInterpret(data);
+          this.addMessage(response.message, 'assistant', response.buttons);
 
-.then(res => res.json())
-.then(data => {
-   const response = safeInterpret(data);
-   this.addMessage(response.message, "assistant");
+          this.history.push({ role: 'user', content: message });
+          this.history.push({ role: 'assistant', content: response.message });
 
-   this.history.push({ role: "user", content: message });
-   this.history.push({ role: "assistant", content: response.message });
+          if (response.leadSubmitted && response.leadData) {
+            const name = response.leadData.name ? ` for ${response.leadData.name}` : '';
+            this.addMessage(`✅ Lead captured${name}. We'll be in touch soon!`, 'system');
+          }
 
-    // ... normalization, history, rendering ...
-  })
-  .catch(err => {
-    this.showTyping(false);
-    this.addMessage(
-      `⚠️ ERROR CAUGHT: ${err.message || err}`,
-      'system'
-    );
-    console.error("CHAT ERROR:", err);
+          if (response.ticketData) {
+            this.addMessage('✅ Support ticket created. We\'ll get back to you soon!', 'system');
+          }
 
-    input.disabled = false;
-    sendBtn.disabled = false;
-    input.focus();
-  });
+          if (response.conversationCompleted) {
+            this.addMessage(
+              '🟢 Thank you! This conversation has been completed. Feel free to start a new chat if you have more questions.',
+              'system'
+            );
+          }
 
+          input.disabled = false;
+          sendBtn.disabled = false;
+          input.focus();
+        })
+        .catch((err) => {
+          this.showTyping(false);
+          this.addMessage('Sorry, something went wrong. Please try again.', 'assistant');
+          console.error('Monumentum chat error:', err);
+          input.disabled = false;
+          sendBtn.disabled = false;
+          input.focus();
+        });
     },
 
-    addMessage: function(text, role, buttons) {
+    addMessage: function (text, role, buttons) {
       const messagesContainer = document.getElementById('monumentum-chat-messages');
       const messageDiv = document.createElement('div');
       messageDiv.className = `monumentum-message ${role}`;
@@ -498,10 +459,18 @@
       if (buttons && buttons.length > 0) {
         buttons.forEach((btn) => {
           const button = document.createElement('button');
-          button.style.cssText = 'padding: 8px 16px; background: #0066cc; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 4px;';
-          button.innerHTML = btn.label;
+          button.style.cssText =
+            'padding: 8px 16px; background: #0066cc; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 4px;';
+          button.textContent = btn.label || btn.text || btn.title || String(btn.value || '');
           button.onclick = () => {
-            document.getElementById('monumentum-chat-input').value = btn.value;
+            const value =
+              btn.value ??
+              btn.payload ??
+              btn.text ??
+              btn.label ??
+              '';
+            const inputEl = document.getElementById('monumentum-chat-input');
+            inputEl.value = value;
             this.sendMessage();
           };
           messagesContainer.appendChild(button);
@@ -511,8 +480,9 @@
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
     },
 
-    showTyping: function(show) {
+    showTyping: function (show) {
       const typing = document.querySelector('.monumentum-typing');
+      if (!typing) return;
       if (show) {
         typing.classList.add('show');
       } else {
@@ -522,11 +492,15 @@
   };
 
   window.MonumentumChat = MonumentumChat;
-  console.log('Monumentum Integrated Sales & Service Widget v1.1 loaded');
+  console.log('Monumentum Integrated Agent Widget v2.0 loaded');
 
   window.addEventListener('beforeunload', () => {
     try {
-      const id = (window.MonumentumChat && window.MonumentumChat.config && window.MonumentumChat.config.customerId) || '';
+      const id =
+        (window.MonumentumChat &&
+          window.MonumentumChat.config &&
+          window.MonumentumChat.config.customerId) ||
+        '';
       if (id) {
         localStorage.removeItem(`monumentum_session_${id}`);
       } else {
