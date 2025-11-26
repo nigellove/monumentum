@@ -322,23 +322,75 @@
     },
 
     parseResponse: function(raw) {
-      let response = raw;
-      if (Array.isArray(response)) {
-        response = response[0] || {};
-      }
+      const tryJson = (value) => {
+        if (typeof value !== 'string') return value;
+        const trimmed = value.trim();
+        if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) return value;
+        try {
+          return JSON.parse(trimmed);
+        } catch (err) {
+          console.warn('Monumentum: could not parse stringified JSON response', err);
+          return value;
+        }
+      };
 
-      if (response && typeof response === 'object' && (response.data || response.response)) {
-        response = response.data || response.response;
-      }
+      const unwrap = (value) => {
+        let current = value;
+        let hops = 0;
 
+        while (current && hops < 8) {
+          const maybeParsed = tryJson(current);
+          if (maybeParsed !== current) {
+            current = maybeParsed;
+            hops += 1;
+            continue;
+          }
+
+          if (Array.isArray(current)) {
+            current = current[0];
+            hops += 1;
+            continue;
+          }
+
+          if (
+            current &&
+            typeof current === 'object' &&
+            (current.data || current.response || current.json || current.body || current.result)
+          ) {
+            current = current.data ?? current.response ?? current.json ?? current.body ?? current.result;
+            hops += 1;
+            continue;
+          }
+
+          break;
+        }
+
+        return current;
+      };
+
+      const response = unwrap(raw) ?? {};
       const textFields = ['message', 'answer', 'text', 'content'];
-      const message = textFields
-        .map((key) => (typeof response?.[key] === 'string' ? response[key].trim() : ''))
-        .find((val) => val);
+
+      const message =
+        typeof response === 'string'
+          ? response.trim()
+          : textFields
+              .map((key) => (typeof response?.[key] === 'string' ? response[key].trim() : ''))
+              .find((val) => val);
+
+      const buttonSource = response?.buttons ?? response?.options ?? response?.actions ?? [];
+      const buttons = Array.isArray(buttonSource)
+        ? buttonSource
+            .map((btn) => ({
+              label: btn?.label || btn?.text || btn?.title || String(btn?.value ?? btn?.payload ?? ''),
+              value: btn?.value ?? btn?.payload ?? btn?.text ?? btn?.label ?? ''
+            }))
+            .filter((btn) => btn.label && btn.value)
+        : [];
 
       return {
         message: message || 'Sorry, I didn\'t understand that.',
-        buttons: response?.buttons || response?.options || [],
+        buttons,
         leadSubmitted: Boolean(response?.leadSubmitted || response?.hasLead),
         leadData: response?.leadData || null,
         ticketData: response?.ticketData || null,
@@ -418,7 +470,6 @@
       messageDiv.className = `monumentum-message ${role}`;
 
       const linkedText = text.replace(
-        ///(https?:\\/\\/[^\\s]+)/g,
         /(https?:\/\/[^\s]+)/g,
         '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
       );
