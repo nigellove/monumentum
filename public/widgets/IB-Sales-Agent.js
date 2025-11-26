@@ -272,9 +272,6 @@
           <strong>Chat with Us</strong>
           <button id="monumentum-chat-close" style="background:none;border:none;color:white;font-size:24px;cursor:pointer;line-height:1;padding:0;width:30px;height:30px;" aria-label="Close chat">×</button>
         </div>
-        <div id="monumentum-chat-messages">
-          <div class="monumentum-message assistant">${this.config.greeting}</div>
-        </div>
         <div class="monumentum-typing">
           <span></span><span></span><span></span>
         </div>
@@ -319,7 +316,7 @@ attachEventListeners: function() {
       }
     },
     
-    sendMessage: function() {
+sendMessage: function() {
   const input = document.getElementById('monumentum-chat-input');
   const sendBtn = document.getElementById('monumentum-chat-send');
   const message = input.value.trim();
@@ -352,18 +349,19 @@ attachEventListeners: function() {
   .then(data => {
     this.showTyping(false);
     
-    const reply = data[0].message || 'Sorry, I didn\'t understand that.';
+    const obj = Array.isArray(data) ? data[0] : data;
+    const reply = obj.message || 'Sorry, I didn\'t understand that.';
     this.addMessage(reply, 'assistant');
     
     this.history.push({ role: 'user', content: message });
     this.history.push({ role: 'assistant', content: reply });
     
-    if (data[0].hasLead && data[0].leadData) {
-      const name = data[0].leadData.name ? ` for ${data[0].leadData.name}` : '';
+    if (obj.leadSubmitted && obj.leadData) {
+      const name = obj.leadData.name ? ` for ${obj.leadData.name}` : '';
       this.addMessage(`✅ Lead captured${name}. We'll be in touch soon!`, 'system');
     }
     
-    if (data[0].conversationCompleted) {
+    if (obj.conversationCompleted) {
       this.addMessage('🟢 Thank you! This conversation has been completed. Feel free to start a new chat if you have more questions.', 'system');
     }
     
