@@ -1,54 +1,47 @@
-(function () {
+(function() {
   'use strict';
-
+  
   const MonumentumChat = {
     config: {
-      webhookUrl: 'https://nkwmfqbuhvtloihbrwef.supabase.co/functions/v1/agent', // Supabase edge function
+      webhookUrl: 'https://nkwmfqbuhvtloihbrwef.supabase.co/functions/v1/agent',
       customerId: null,
       position: 'bottom-right',
       primaryColor: '#0066cc',
       greeting: 'Hi! How can we help you today?'
     },
-
+    
     sessionId: null,
     chatOpen: false,
     history: [],
-
-    init: function (userConfig) {
-      // Merge user config
+    
+    init: function(userConfig) {
       Object.assign(this.config, userConfig);
-
-      // Validate customerId
+      
       if (!this.config.customerId) {
         console.error('Monumentum: customerId is required');
         return;
       }
-
-      // Generate or retrieve sessionId
+      
       this.sessionId = this.getOrCreateSession();
-
-      // Initialize history
       this.history = [];
-
-      // Inject CSS and UI
       this.injectStyles();
       this.createChatUI();
       this.attachEventListeners();
     },
-
-    getOrCreateSession: function () {
+    
+    getOrCreateSession: function() {
       const storageKey = `monumentum_session_${this.config.customerId}`;
       let sessionId = localStorage.getItem(storageKey);
-
+      
       if (!sessionId) {
         sessionId = `sess_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         localStorage.setItem(storageKey, sessionId);
       }
-
+      
       return sessionId;
     },
-
-    injectStyles: function () {
+    
+    injectStyles: function() {
       const styles = `
         #monumentum-chat-button {
           position: fixed;
@@ -68,11 +61,11 @@
           z-index: 9999;
           transition: transform 0.3s;
         }
-
+        
         #monumentum-chat-button:hover {
           transform: scale(1.1);
         }
-
+        
         #monumentum-chat-window {
           position: fixed;
           ${this.config.position.includes('right') ? 'right: 20px;' : 'left: 20px;'}
@@ -89,11 +82,11 @@
           z-index: 9998;
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
-
+        
         #monumentum-chat-window.open {
           display: flex;
         }
-
+        
         #monumentum-chat-header {
           background: ${this.config.primaryColor};
           color: white;
@@ -104,7 +97,7 @@
           align-items: center;
           font-weight: 600;
         }
-
+        
         #monumentum-chat-messages {
           flex: 1;
           overflow-y: auto;
@@ -114,7 +107,7 @@
           gap: 12px;
           background: #fafafa;
         }
-
+        
         .monumentum-message {
           max-width: 80%;
           padding: 10px 14px;
@@ -122,14 +115,14 @@
           word-wrap: break-word;
           line-height: 1.4;
         }
-
+        
         .monumentum-message.user {
           background: ${this.config.primaryColor};
           color: white;
           align-self: flex-end;
           border-bottom-right-radius: 4px;
         }
-
+        
         .monumentum-message.assistant {
           background: white;
           color: #333;
@@ -137,7 +130,15 @@
           border-bottom-left-radius: 4px;
           box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
-
+        
+        .monumentum-message a {
+          color: #0066cc;
+          text-decoration: underline;
+          display: block;
+          margin: 8px 0;
+          word-break: break-all;
+        }
+        
         .monumentum-message.system {
           background: #fff9e6;
           color: #856404;
@@ -147,14 +148,22 @@
           border: 1px solid #ffeaa7;
         }
 
-        .monumentum-message a {
-          color: #0066cc;
-          text-decoration: underline;
-          display: block;
-          margin: 8px 0;
-          word-break: break-all;
+        .monumentum-button {
+          padding: 8px 16px;
+          background: ${this.config.primaryColor};
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          margin: 4px;
+          font-size: 14px;
+          font-family: inherit;
         }
 
+        .monumentum-button:hover {
+          opacity: 0.9;
+        }
+        
         #monumentum-chat-input-container {
           padding: 16px;
           border-top: 1px solid #e0e0e0;
@@ -163,7 +172,7 @@
           background: white;
           border-radius: 0 0 12px 12px;
         }
-
+        
         #monumentum-chat-input {
           flex: 1;
           padding: 10px 12px;
@@ -173,11 +182,11 @@
           font-size: 14px;
           font-family: inherit;
         }
-
+        
         #monumentum-chat-input:focus {
           border-color: ${this.config.primaryColor};
         }
-
+        
         #monumentum-chat-send {
           background: ${this.config.primaryColor};
           color: white;
@@ -191,16 +200,16 @@
           justify-content: center;
           transition: opacity 0.2s;
         }
-
+        
         #monumentum-chat-send:hover {
           opacity: 0.9;
         }
-
+        
         #monumentum-chat-send:disabled {
           opacity: 0.5;
           cursor: not-allowed;
         }
-
+        
         .monumentum-typing {
           display: none;
           padding: 10px 14px;
@@ -210,11 +219,11 @@
           max-width: 80px;
           box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
-
+        
         .monumentum-typing.show {
           display: block;
         }
-
+        
         .monumentum-typing span {
           height: 8px;
           width: 8px;
@@ -224,15 +233,15 @@
           margin: 0 2px;
           animation: bounce 1.4s infinite ease-in-out both;
         }
-
+        
         .monumentum-typing span:nth-child(1) { animation-delay: -0.32s; }
         .monumentum-typing span:nth-child(2) { animation-delay: -0.16s; }
-
+        
         @keyframes bounce {
           0%, 80%, 100% { transform: scale(0); }
           40% { transform: scale(1); }
         }
-
+        
         @media (max-width: 480px) {
           #monumentum-chat-window {
             width: calc(100vw - 20px);
@@ -243,13 +252,13 @@
           }
         }
       `;
-
+      
       const styleSheet = document.createElement('style');
       styleSheet.textContent = styles;
       document.head.appendChild(styleSheet);
     },
-
-    createChatUI: function () {
+    
+    createChatUI: function() {
       const button = document.createElement('button');
       button.id = 'monumentum-chat-button';
       button.setAttribute('aria-label', 'Open chat');
@@ -258,10 +267,10 @@
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
         </svg>
       `;
-
-      const windowEl = document.createElement('div');
-      windowEl.id = 'monumentum-chat-window';
-      windowEl.innerHTML = `
+      
+      const window = document.createElement('div');
+      window.id = 'monumentum-chat-window';
+      window.innerHTML = `
         <div id="monumentum-chat-header">
           <strong>Chat with Us</strong>
           <button id="monumentum-chat-close" style="background:none;border:none;color:white;font-size:24px;cursor:pointer;line-height:1;padding:0;width:30px;height:30px;" aria-label="Close chat">×</button>
@@ -280,209 +289,132 @@
           </button>
         </div>
       `;
-
+      
       document.body.appendChild(button);
-      document.body.appendChild(windowEl);
+      document.body.appendChild(window);
     },
-
-    attachEventListeners: function () {
+    
+    attachEventListeners: function() {
       const button = document.getElementById('monumentum-chat-button');
       const closeBtn = document.getElementById('monumentum-chat-close');
       const sendBtn = document.getElementById('monumentum-chat-send');
       const input = document.getElementById('monumentum-chat-input');
-
-      if (!button || !closeBtn || !sendBtn || !input) {
-        console.error('Monumentum: Chat UI elements not found');
-        return;
-      }
-
+      
       button.addEventListener('click', () => this.toggleChat());
       closeBtn.addEventListener('click', () => this.toggleChat());
       sendBtn.addEventListener('click', () => this.sendMessage());
       input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          this.sendMessage();
-        }
+        if (e.key === 'Enter') this.sendMessage();
       });
     },
-
-    toggleChat: function () {
-      const windowEl = document.getElementById('monumentum-chat-window');
+    
+    toggleChat: function() {
+      const window = document.getElementById('monumentum-chat-window');
       this.chatOpen = !this.chatOpen;
-
+      
       if (this.chatOpen) {
-        windowEl.classList.add('open');
+        window.classList.add('open');
         document.getElementById('monumentum-chat-input').focus();
-
-        if (this.history.length === 0) {
-          const greeting =
-            this.config.businessGreeting ||
-            this.config.greeting ||
-            'Hi there! How can I help you today?';
-          this.addMessage(greeting, 'assistant');
-        }
       } else {
-        windowEl.classList.remove('open');
+        window.classList.remove('open');
       }
     },
-
-    buildPayload: function (message) {
-      const conversationHistory = [...this.history, { role: 'user', content: message }];
-      return {
-        agentType: 'integrated',
-        customerId: this.config.customerId,
-        sessionId: this.sessionId,
-        message,
-        history: conversationHistory
-      };
-    },
-
-    safeInterpret: function (data) {
-      try {
-        // If backend gave us a string, try to parse, else treat as a direct message
-        if (typeof data === 'string') {
-          try {
-            data = JSON.parse(data);
-          } catch (e) {
-            return { message: data };
-          }
-        }
-
-        // If backend gave us an array, use the first element
-        if (Array.isArray(data)) {
-          data = data[0] || {};
-        }
-
-        // If still not an object, fallback
-        if (!data || typeof data !== 'object') {
-          return { message: 'Thanks, we\'ll follow up shortly.' };
-        }
-
-        const msg =
-          data.message ||
-          data.answer ||
-          data.text ||
-          data.content ||
-          "Thanks — we'll follow up.";
-
-        return {
-          message: msg,
-          leadSubmitted: Boolean(data.leadSubmitted || data.hasLead),
-          leadData: data.leadData || null,
-          ticketData: data.ticketData || null,
-          conversationCompleted: Boolean(data.conversationCompleted),
-          buttons: Array.isArray(data.buttons) ? data.buttons : null
-        };
-      } catch (e) {
-        console.error('Monumentum: safeInterpret error', e);
-        return { message: 'Thanks — we\'ll follow up.' };
-      }
-    },
-
-    sendMessage: function () {
+    
+    sendMessage: function() {
       const input = document.getElementById('monumentum-chat-input');
       const sendBtn = document.getElementById('monumentum-chat-send');
       const message = input.value.trim();
-
+      
       if (!message) return;
-
+      
       input.disabled = true;
       sendBtn.disabled = true;
+      
       this.addMessage(message, 'user');
       input.value = '';
+      
       this.showTyping(true);
-
-      const payload = this.buildPayload(message);
-
+      
       fetch(this.config.webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+          agentType: "integrated",
+          customerId: this.config.customerId,
+          sessionId: this.sessionId,
+          message: message,
+          history: this.history
+        })
       })
-        .then((res) => {
-          if (!res.ok) throw new Error('Network response was not ok');
-          return res.json();
-        })
-        .then((data) => {
-          this.showTyping(false);
-
-          const response = this.safeInterpret(data);
-          this.addMessage(response.message, 'assistant', response.buttons);
-
-          this.history.push({ role: 'user', content: message });
-          this.history.push({ role: 'assistant', content: response.message });
-
-          if (response.leadSubmitted && response.leadData) {
-            const name = response.leadData.name ? ` for ${response.leadData.name}` : '';
-            this.addMessage(`✅ Lead captured${name}. We'll be in touch soon!`, 'system');
-          }
-
-          if (response.ticketData) {
-            this.addMessage('✅ Support ticket created. We\'ll get back to you soon!', 'system');
-          }
-
-          if (response.conversationCompleted) {
-            this.addMessage(
-              '🟢 Thank you! This conversation has been completed. Feel free to start a new chat if you have more questions.',
-              'system'
-            );
-          }
-
-          input.disabled = false;
-          sendBtn.disabled = false;
-          input.focus();
-        })
-        .catch((err) => {
-          this.showTyping(false);
-          this.addMessage('Sorry, something went wrong. Please try again.', 'assistant');
-          console.error('Monumentum chat error:', err);
-          input.disabled = false;
-          sendBtn.disabled = false;
-          input.focus();
-        });
+      .then(res => {
+        if (!res.ok) throw new Error('Network response was not ok');
+        return res.json();
+      })
+      .then(data => {
+        this.showTyping(false);
+        
+        const obj = Array.isArray(data) ? data[0] : data;
+        const reply = obj.message || 'Sorry, I didn\'t understand that.';
+        this.addMessage(reply, 'assistant', obj.buttons);
+        
+        this.history.push({ role: 'user', content: message });
+        this.history.push({ role: 'assistant', content: reply });
+        
+        if (obj.leadSubmitted && obj.leadData) {
+          const name = obj.leadData.name ? ` for ${obj.leadData.name}` : '';
+          this.addMessage(`✅ Lead captured${name}. We'll be in touch soon!`, 'system');
+        }
+        
+        if (obj.conversationCompleted) {
+          this.addMessage('🟢 Thank you! This conversation has been completed. Feel free to start a new chat if you have more questions.', 'system');
+        }
+        
+        input.disabled = false;
+        sendBtn.disabled = false;
+        input.focus();
+      })
+      .catch(err => {
+        this.showTyping(false);
+        this.addMessage('Sorry, something went wrong. Please try again.', 'assistant');
+        console.error('Chat error:', err);
+        
+        input.disabled = false;
+        sendBtn.disabled = false;
+        input.focus();
+      });
     },
-
-    addMessage: function (text, role, buttons) {
+    
+    addMessage: function(text, role, buttons) {
       const messagesContainer = document.getElementById('monumentum-chat-messages');
       const messageDiv = document.createElement('div');
       messageDiv.className = `monumentum-message ${role}`;
-
+      
       const linkedText = text.replace(
         /(https?:\/\/[^\s]+)/g,
         '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
       );
-
+      
       messageDiv.innerHTML = linkedText;
       messagesContainer.appendChild(messageDiv);
-
+      
       if (buttons && buttons.length > 0) {
         buttons.forEach((btn) => {
           const button = document.createElement('button');
-          button.style.cssText =
-            'padding: 8px 16px; background: #0066cc; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 4px;';
-          button.textContent = btn.label || btn.text || btn.title || String(btn.value || '');
+          button.className = 'monumentum-button';
+          button.innerHTML = btn.label;
           button.onclick = () => {
-            const value =
-              btn.value ??
-              btn.payload ??
-              btn.text ??
-              btn.label ??
-              '';
-            const inputEl = document.getElementById('monumentum-chat-input');
-            inputEl.value = value;
+            document.getElementById('monumentum-chat-input').value = btn.value;
             this.sendMessage();
           };
           messagesContainer.appendChild(button);
         });
       }
-
+      
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
     },
-
-    showTyping: function (show) {
+    
+    showTyping: function(show) {
       const typing = document.querySelector('.monumentum-typing');
-      if (!typing) return;
       if (show) {
         typing.classList.add('show');
       } else {
@@ -490,17 +422,14 @@
       }
     }
   };
-
+  
   window.MonumentumChat = MonumentumChat;
-  console.log('Monumentum Integrated Agent Widget v2.0 loaded');
-
+  
+  console.log('Monumentum Integrated Sales & Service Widget v1.0 loaded');
+  
   window.addEventListener('beforeunload', () => {
     try {
-      const id =
-        (window.MonumentumChat &&
-          window.MonumentumChat.config &&
-          window.MonumentumChat.config.customerId) ||
-        '';
+      const id = (window.MonumentumChat && window.MonumentumChat.config && window.MonumentumChat.config.customerId) || '';
       if (id) {
         localStorage.removeItem(`monumentum_session_${id}`);
       } else {
