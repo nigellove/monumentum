@@ -411,24 +411,25 @@
       input.value = '';
       this.showTyping(true);
 
+
+      console.log("HISTORY SERIALIZABLE?", !!JSON.stringify(this.history));
+
       fetch(this.config.webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+
+
+
+        // NEW CODE
+
         body: JSON.stringify(this.buildPayload(message))
       })
-        .then(async (res) => {
-          const text = await res.text();
-          if (!res.ok) {
-            throw new Error(text || 'Network response was not ok');
-          }
 
-          try {
-            return JSON.parse(text);
-          } catch (err) {
-            console.warn('Monumentum: received non-JSON response, falling back to text', err);
-            return { message: text };
-          }
-        })
+ .then(res => {
+  if (!res.ok) throw new Error('Network response was not ok');
+  return res.json();   // ✅ 1-line fix
+})
+
         .then((data) => {
           this.showTyping(false);
           const response = this.parseResponse(data);
