@@ -432,6 +432,12 @@
 
         .then((data) => {
 
+          // Show EXACT raw JS value the widget received
+this.addMessage(
+  "📦 RAW RESPONSE RECEIVED:\n" + JSON.stringify(data, null, 2),
+  "system"
+);
+
   // --- BULLETPROOF NORMALIZATION ---
   let normalized = data;
 
