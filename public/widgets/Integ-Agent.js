@@ -431,38 +431,60 @@
 })
 
         .then((data) => {
-          this.showTyping(false);
-          const response = this.parseResponse(data);
 
-          this.addMessage(response.message, 'assistant', response.buttons);
-          this.history.push({ role: 'user', content: message });
-          this.history.push({ role: 'assistant', content: response.message });
+  // --- BULLETPROOF NORMALIZATION ---
+  let normalized = data;
 
-          if (response.leadSubmitted && response.leadData) {
-            const name = response.leadData.name ? ` for ${response.leadData.name}` : '';
-            this.addMessage(`✅ Lead captured${name}. We'll be in touch soon!`, 'system');
-          }
+  // 1. If Supabase/n8n returned an array, use first element
+  if (Array.isArray(normalized)) {
+    normalized = normalized[0] || {};
+  }
 
-          if (response.ticketData) {
-            this.addMessage('✅ Support ticket created. We\'ll get back to you soon!', 'system');
-          }
+  // 2. If backend returned text, wrap it
+  if (typeof normalized === "string") {
+    normalized = { message: normalized };
+  }
 
-          if (response.conversationCompleted) {
-            this.addMessage('🟢 Thank you! This conversation has been completed. Feel free to start a new chat if you have more questions.', 'system');
-          }
+  // 3. If backend returned empty or weird shape
+  if (!normalized || typeof normalized !== "object") {
+    normalized = { message: "Thank you for your message." };
+  }
 
-          input.disabled = false;
-          sendBtn.disabled = false;
-          input.focus();
-        })
-        .catch((err) => {
-          this.showTyping(false);
-          this.addMessage('Sorry, something went wrong. Please try again.', 'assistant');
-          console.error('Chat error:', err);
-          input.disabled = false;
-          sendBtn.disabled = false;
-          input.focus();
-        });
+  // 4. Guarantee message exists
+  if (!normalized.message || typeof normalized.message !== "string") {
+    normalized.message = "Thank you — we'll follow up shortly.";
+  }
+  // --- END NORMALIZATION ---
+
+  this.showTyping(false);
+
+  // USE NORMALIZED DIRECTLY — DO NOT CALL parseResponse()
+  const response = normalized;
+
+  this.addMessage(response.message, 'assistant');
+
+  // Update history
+  this.history.push({ role: 'user', content: message });
+  this.history.push({ role: 'assistant', content: response.message });
+
+  if (response.leadSubmitted && response.leadData) {
+    const name = response.leadData.name ? ` for ${response.leadData.name}` : '';
+    this.addMessage(`✅ Lead captured${name}. We'll be in touch soon!`, 'system');
+  }
+
+  if (response.ticketData) {
+    this.addMessage('✅ Support ticket created. We\'ll get back to you soon!', 'system');
+  }
+
+  if (response.conversationCompleted) {
+    this.addMessage('🟢 Thank you! This conversation has been completed. Feel free to start a new chat if you have more questions.', 'system');
+  }
+
+  input.disabled = false;
+  sendBtn.disabled = false;
+  input.focus();
+})
+
     },
 
     addMessage: function(text, role, buttons) {
