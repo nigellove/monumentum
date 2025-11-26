@@ -416,9 +416,7 @@ toggleChat: function() {
 })
 .then(async res => {
   if (!res.ok) throw new Error('Network response was not ok');
-  const text = await res.text();
-  try { return JSON.parse(text); }
-  catch { return { message: text }; }
+  return res.json();
 })
 .then(data => {
   this.showTyping(false);
