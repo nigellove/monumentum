@@ -320,92 +320,82 @@ attachEventListeners: function() {
     },
     
     sendMessage: function() {
-      const input = document.getElementById('monumentum-chat-input');
-      const sendBtn = document.getElementById('monumentum-chat-send');
-      const message = input.value.trim();
-      
-      if (!message) return;
-      
-      // Disable input while sending
-      input.disabled = true;
-      sendBtn.disabled = true;
-      
-      // Display user message
-      this.addMessage(message, 'user');
-      input.value = '';
-      
-      // Show typing indicator
-      this.showTyping(true);
-      
-      // Send to webhook WITH HISTORY ✓
-      fetch(this.config.webhookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          agentType: "sales",    
-          customerId: this.config.customerId,
-          sessionId: this.sessionId,
-          message: message,
-          history: this.history  // ✓ CRITICAL: Send conversation history
-        })
-      })
-      .then(res => {
-        if (!res.ok) throw new Error('Network response was not ok');
-        return res.json();
-      })
-      .then(data => {
-        this.showTyping(false);
-        
-        const reply = data.message || 'Sorry, I didn\'t understand that.';
-        this.addMessage(reply, 'assistant');
-        
-        // ✓ UPDATE LOCAL HISTORY
-        this.history.push({ role: 'user', content: message });
-        this.history.push({ role: 'assistant', content: reply });
-        
-        // Show lead captured notification
-        if (data.hasLead && data.leadData) {
-          const name = data.leadData.name ? ` for ${data.leadData.name}` : '';
-          this.addMessage(`✅ Lead captured${name}. We'll be in touch soon!`, 'system');
-        }
-        
-        // Show conversation completed notice
-        if (data.conversationCompleted) {
-          this.addMessage('🟢 Thank you! This conversation has been completed. Feel free to start a new chat if you have more questions.', 'system');
-        }
-        
-        // Re-enable input
-        input.disabled = false;
-        sendBtn.disabled = false;
-        input.focus();
-      })
-      .catch(err => {
-        this.showTyping(false);
-        this.addMessage('Sorry, something went wrong. Please try again.', 'assistant');
-        console.error('Chat error:', err);
-        
-        // Re-enable input
-        input.disabled = false;
-        sendBtn.disabled = false;
-        input.focus();
-      });
-    },
+  const input = document.getElementById('monumentum-chat-input');
+  const sendBtn = document.getElementById('monumentum-chat-send');
+  const message = input.value.trim();
+  
+  if (!message) return;
+  
+  input.disabled = true;
+  sendBtn.disabled = true;
+  
+  this.addMessage(message, 'user');
+  input.value = '';
+  
+  this.showTyping(true);
+  
+  fetch(this.config.webhookUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      agentType: "integrated",    
+      customerId: this.config.customerId,
+      sessionId: this.sessionId,
+      message: message,
+      history: this.history
+    })
+  })
+  .then(res => {
+    if (!res.ok) throw new Error('Network response was not ok');
+    return res.json();
+  })
+  .then(data => {
+    this.showTyping(false);
     
-    addMessage: function(text, role) {
-      const messagesContainer = document.getElementById('monumentum-chat-messages');
-      const messageDiv = document.createElement('div');
-      messageDiv.className = `monumentum-message ${role}`;
-      
-      // ✓ AUTO-LINK URLs (make Calendly/booking links clickable)
-      const linkedText = text.replace(
-        /(https?:\/\/[^\s]+)/g,
-        '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
-      );
-      
-      messageDiv.innerHTML = linkedText;
-      messagesContainer.appendChild(messageDiv);
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    },
+    const reply = data[0].message || 'Sorry, I didn\'t understand that.';
+    this.addMessage(reply, 'assistant');
+    
+    this.history.push({ role: 'user', content: message });
+    this.history.push({ role: 'assistant', content: reply });
+    
+    if (data[0].hasLead && data[0].leadData) {
+      const name = data[0].leadData.name ? ` for ${data[0].leadData.name}` : '';
+      this.addMessage(`✅ Lead captured${name}. We'll be in touch soon!`, 'system');
+    }
+    
+    if (data[0].conversationCompleted) {
+      this.addMessage('🟢 Thank you! This conversation has been completed. Feel free to start a new chat if you have more questions.', 'system');
+    }
+    
+    input.disabled = false;
+    sendBtn.disabled = false;
+    input.focus();
+  })
+  .catch(err => {
+    this.showTyping(false);
+    this.addMessage('Sorry, something went wrong. Please try again.', 'assistant');
+    console.error('Chat error:', err);
+    
+    input.disabled = false;
+    sendBtn.disabled = false;
+    input.focus();
+  });
+},
+
+addMessage: function(text, role) {
+  const messagesContainer = document.getElementById('monumentum-chat-messages');
+  const messageDiv = document.createElement('div');
+  messageDiv.className = `monumentum-message ${role}`;
+  
+  const linkedText = text.replace(
+    /(https?:\/\/[^\s]+)/g,
+    '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
+  );
+  
+  messageDiv.innerHTML = linkedText;
+  messagesContainer.appendChild(messageDiv);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+},
     
     showTyping: function(show) {
       const typing = document.querySelector('.monumentum-typing');
