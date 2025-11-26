@@ -415,81 +415,36 @@
       console.log("HISTORY SERIALIZABLE?", !!JSON.stringify(this.history));
 
       fetch(this.config.webhookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-
-
-
-        // NEW CODE
-
-        body: JSON.stringify(this.buildPayload(message))
-      })
-
- .then(res => {
-  if (!res.ok) throw new Error('Network response was not ok');
-  return res.json();   // ✅ 1-line fix
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(this.buildPayload(message))
 })
+  .then(res => {
+    if (!res.ok) throw new Error('Network response was not ok');
+    return res.json();
+  })
+  .then((data) => {
 
-        .then((data) => {
+    // RAW RESPONSE HERE
+    this.addMessage(
+      "📦 RAW RESPONSE RECEIVED:\n" + JSON.stringify(data, null, 2),
+      "system"
+    );
 
-          // Show EXACT raw JS value the widget received
-this.addMessage(
-  "📦 RAW RESPONSE RECEIVED:\n" + JSON.stringify(data, null, 2),
-  "system"
-);
+    // ... normalization, history, rendering ...
+  })
+  .catch(err => {
+    this.showTyping(false);
+    this.addMessage(
+      `⚠️ ERROR CAUGHT: ${err.message || err}`,
+      'system'
+    );
+    console.error("CHAT ERROR:", err);
 
-  // --- BULLETPROOF NORMALIZATION ---
-  let normalized = data;
-
-  // 1. If Supabase/n8n returned an array, use first element
-  if (Array.isArray(normalized)) {
-    normalized = normalized[0] || {};
-  }
-
-  // 2. If backend returned text, wrap it
-  if (typeof normalized === "string") {
-    normalized = { message: normalized };
-  }
-
-  // 3. If backend returned empty or weird shape
-  if (!normalized || typeof normalized !== "object") {
-    normalized = { message: "Thank you for your message." };
-  }
-
-  // 4. Guarantee message exists
-  if (!normalized.message || typeof normalized.message !== "string") {
-    normalized.message = "Thank you — we'll follow up shortly.";
-  }
-  // --- END NORMALIZATION ---
-
-  this.showTyping(false);
-
-  // USE NORMALIZED DIRECTLY — DO NOT CALL parseResponse()
-  const response = normalized;
-
-  this.addMessage(response.message, 'assistant');
-
-  // Update history
-  this.history.push({ role: 'user', content: message });
-  this.history.push({ role: 'assistant', content: response.message });
-
-  if (response.leadSubmitted && response.leadData) {
-    const name = response.leadData.name ? ` for ${response.leadData.name}` : '';
-    this.addMessage(`✅ Lead captured${name}. We'll be in touch soon!`, 'system');
-  }
-
-  if (response.ticketData) {
-    this.addMessage('✅ Support ticket created. We\'ll get back to you soon!', 'system');
-  }
-
-  if (response.conversationCompleted) {
-    this.addMessage('🟢 Thank you! This conversation has been completed. Feel free to start a new chat if you have more questions.', 'system');
-  }
-
-  input.disabled = false;
-  sendBtn.disabled = false;
-  input.focus();
-})
+    input.disabled = false;
+    sendBtn.disabled = false;
+    input.focus();
+  });
 
     },
 
