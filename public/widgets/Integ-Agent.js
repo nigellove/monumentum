@@ -398,6 +398,42 @@
       };
     },
 
+        safeInterpret: function(data) {
+      try {
+        if (typeof data === "string") {
+          try { data = JSON.parse(data); } catch { return { message: data }; }
+        }
+
+        if (Array.isArray(data)) {
+          data = data[0] || {};
+        }
+
+        if (!data || typeof data !== "object") {
+          return { message: "Thanks, we'll follow up shortly." };
+        }
+
+        const msg =
+          data.message ||
+          data.answer ||
+          data.text ||
+          data.content ||
+          "Thanks — we'll follow up.";
+
+        return {
+          message: msg,
+          leadSubmitted: Boolean(data.leadSubmitted || data.hasLead),
+          leadData: data.leadData || null,
+          ticketData: data.ticketData || null,
+          conversationCompleted: Boolean(data.conversationCompleted),
+          buttons: Array.isArray(data.buttons) ? data.buttons : null
+        };
+
+      } catch (e) {
+        return { message: "Thanks — we'll follow up." };
+      }
+    },
+
+
     sendMessage: function() {
       const input = document.getElementById('monumentum-chat-input');
       const sendBtn = document.getElementById('monumentum-chat-send');
@@ -419,17 +455,15 @@
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify(this.buildPayload(message))
 })
-  .then(res => {
-    if (!res.ok) throw new Error('Network response was not ok');
-    return res.json();
-  })
-  .then((data) => {
 
-    // RAW RESPONSE HERE
-    this.addMessage(
-      "📦 RAW RESPONSE RECEIVED:\n" + JSON.stringify(data, null, 2),
-      "system"
-    );
+
+.then(res => res.json())
+.then(data => {
+   const response = safeInterpret(data);
+   this.addMessage(response.message, "assistant");
+
+   this.history.push({ role: "user", content: message });
+   this.history.push({ role: "assistant", content: response.message });
 
     // ... normalization, history, rendering ...
   })
