@@ -367,11 +367,17 @@
         return res.json();
       })
       .then(data => {
-        this.showTyping(false);
-        
-        const obj = Array.isArray(data) ? data[0] : data;
-        const reply = obj.message || 'Sorry, I didn\'t understand that.';
-        this.addMessage(reply, 'assistant', obj.buttons);
+  this.showTyping(false);
+  
+  console.log('DEBUG: raw data received =', data);
+  
+  const obj = Array.isArray(data) ? data[0] : data;
+  console.log('DEBUG: obj after unwrap =', obj);
+  
+  const reply = obj.message || 'Sorry, I didn\'t understand that.';
+  console.log('DEBUG: reply =', reply);
+  
+  this.addMessage(reply, 'assistant', obj.buttons);
         
         this.history.push({ role: 'user', content: message });
         this.history.push({ role: 'assistant', content: reply });
