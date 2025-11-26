@@ -15,6 +15,9 @@
     history: [],
     
     init: function(userConfig) {
+      if (window.__monumentum_integrated_init__) return;
+      window.__monumentum_integrated_init__ = true;
+
       Object.assign(this.config, userConfig);
       
       if (!this.config.customerId) {
@@ -302,9 +305,15 @@
       
       button.addEventListener('click', () => this.toggleChat());
       closeBtn.addEventListener('click', () => this.toggleChat());
-      sendBtn.addEventListener('click', () => this.sendMessage());
+      sendBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.sendMessage();
+      });
       input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') this.sendMessage();
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          this.sendMessage();
+        }
       });
     },
     
@@ -315,6 +324,11 @@
       if (this.chatOpen) {
         window.classList.add('open');
         document.getElementById('monumentum-chat-input').focus();
+        
+        if (this.history.length === 0) {
+          const greeting = this.config.greeting || "Hi there! How can I help you today?";
+          this.addMessage(greeting, 'assistant');
+        }
       } else {
         window.classList.remove('open');
       }
@@ -335,6 +349,8 @@
       
       this.showTyping(true);
       
+      const conversationHistory = [...this.history, { role: 'user', content: message }];
+      
       fetch(this.config.webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -343,7 +359,7 @@
           customerId: this.config.customerId,
           sessionId: this.sessionId,
           message: message,
-          history: this.history
+          history: conversationHistory
         })
       })
       .then(res => {
