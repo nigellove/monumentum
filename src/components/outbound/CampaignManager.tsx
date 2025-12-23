@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import { supabase } from '../../lib/supabase';
 import {
   getCampaigns,
   createCampaign,
@@ -7,7 +8,7 @@ import {
   deleteCampaign,
   OutboundCampaign
 } from '../../lib/outbound';
-import { Plus, Edit2, Trash2, Play, Pause, CheckCircle } from 'lucide-react';
+import { Plus, Edit2, Trash2, Play, Pause, CheckCircle, Sparkles } from 'lucide-react';
 
 export default function CampaignManager() {
   const { user } = useAuth();
@@ -15,6 +16,7 @@ export default function CampaignManager() {
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingCampaign, setEditingCampaign] = useState<OutboundCampaign | null>(null);
+  const [generatingProspects, setGeneratingProspects] = useState<string | null>(null);
 
   useEffect(() => {
     loadCampaigns();
@@ -54,6 +56,57 @@ export default function CampaignManager() {
     } catch (error) {
       console.error('Error updating campaign status:', error);
       alert('Failed to update campaign status');
+    }
+  };
+
+  const handleGenerateProspects = async (campaign: OutboundCampaign, limit: number = 25) => {
+    if (!user?.id || !campaign.target_icp) {
+      alert('Campaign must have ICP targeting configured');
+      return;
+    }
+
+    setGeneratingProspects(campaign.id);
+
+    try {
+      const webhookUrl = import.meta.env.VITE_N8N_GENERATE_PROSPECTS_URL;
+      if (!webhookUrl) {
+        throw new Error('Webhook URL not configured');
+      }
+
+      // Get customer_id from profile
+      const { data: profile } = await supabase
+        .from('business_profiles')
+        .select('customer_id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!profile?.customer_id) {
+        throw new Error('No customer profile found');
+      }
+
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          campaign_id: campaign.id,
+          user_id: user.id,
+          customer_id: profile.customer_id,
+          target_icp: campaign.target_icp,
+          prospect_limit: limit
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate prospects');
+      }
+
+      const result = await response.json();
+      alert(`Success! Generated ${result.prospects_generated} prospects. Check the Review Queue to approve them.`);
+    } catch (error) {
+      console.error('Error generating prospects:', error);
+      alert('Failed to generate prospects. Please try again.');
+    } finally {
+      setGeneratingProspects(null);
     }
   };
 
@@ -180,10 +233,27 @@ export default function CampaignManager() {
               </div>
 
               {/* Actions */}
-              <div className="mt-6 pt-4 border-t border-slate-200 flex gap-2">
+              <div className="mt-6 pt-4 border-t border-slate-200 flex flex-col gap-2">
+                <button
+                  onClick={() => handleGenerateProspects(campaign)}
+                  disabled={generatingProspects === campaign.id}
+                  className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold transition hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {generatingProspects === campaign.id ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-5 h-5" />
+                      Generate 25 Prospects
+                    </>
+                  )}
+                </button>
                 <button
                   onClick={() => handleStatusToggle(campaign)}
-                  className={`flex-1 py-2 px-4 rounded-lg font-semibold transition ${
+                  className={`w-full py-2 px-4 rounded-lg font-semibold transition ${
                     campaign.status === 'active'
                       ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
                       : 'bg-green-100 text-green-800 hover:bg-green-200'
