@@ -49,6 +49,12 @@ export default function CSVUpload() {
     try {
       const data = await getCampaigns();
       setCampaigns(data);
+
+      // Auto-select "Default Campaign" if it exists
+      const defaultCampaign = data.find(c => c.campaign_name === 'Default Campaign');
+      if (defaultCampaign) {
+        setSelectedCampaign(defaultCampaign.id);
+      }
     } catch (error) {
       console.error('Error loading campaigns:', error);
     }
@@ -162,11 +168,7 @@ export default function CSVUpload() {
       return;
     }
 
-    if (!selectedCampaign) {
-      setError('Please select a campaign');
-      return;
-    }
-
+    // Campaign is optional now (will default to "Default Campaign" or null)
     setError('');
     setStep('preview');
   };
