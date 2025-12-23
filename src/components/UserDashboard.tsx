@@ -51,9 +51,9 @@ const generateSignedUrl = async (filePath: string): Promise<string> => {
   let storagePath = filePath;
 
   // 1️⃣ Strip full Supabase domain if present
-  const supabaseBase = 'https://nkwmfqbuhvtloihbrwef.supabase.co/storage/v1/object/';
-  if (storagePath.startsWith(supabaseBase)) {
-    storagePath = storagePath.substring(supabaseBase.length);
+  const { API_CONFIG } = await import('../config/api');
+  if (storagePath.startsWith(API_CONFIG.storageUrl)) {
+    storagePath = storagePath.substring(API_CONFIG.storageUrl.length);
   }
 
   // 2️⃣ Remove optional 'public/users/' or 'users/' prefix
@@ -117,10 +117,11 @@ const generateSignedUrl = async (filePath: string): Promise<string> => {
 
    
   // Generate signed URLs for each file
-  /*const filesWithSignedUrls = await Promise.all(
+  /*const { API_CONFIG } = await import('../config/api');
+  const filesWithSignedUrls = await Promise.all(
     filesResult.data.map(async (file) => ({
       ...file,
-      file_url: await generateSignedUrl(file.file_path || file.file_url.replace('https://nkwmfqbuhvtloihbrwef.supabase.co/storage/v1/object/public/', ''))
+      file_url: await generateSignedUrl(file.file_path || file.file_url.replace(`${API_CONFIG.storageUrl}public/`, ''))
     }))
   );
   setFiles(filesWithSignedUrls);*/

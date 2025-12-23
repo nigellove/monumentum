@@ -20,7 +20,8 @@ const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
   try {
-    const response = await fetch('https://nkwmfqbuhvtloihbrwef.supabase.co/functions/v1/contact-form', {
+    const { ENDPOINTS } = await import('../config/api');
+    const response = await fetch(ENDPOINTS.contactForm, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

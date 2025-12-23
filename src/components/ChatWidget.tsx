@@ -21,7 +21,15 @@ export default function ChatWidget({ isOpen, onClose }: ChatWidgetProps) {
   const [history, setHistory] = useState<any[]>([]);
   const [memoryKey, setMemoryKey] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const apiUrl = "https://nkwmfqbuhvtloihbrwef.supabase.co/functions/v1/agent";
+
+  // Import API config dynamically
+  const [apiUrl, setApiUrl] = useState("");
+
+  useEffect(() => {
+    import('../config/api').then(({ ENDPOINTS }) => {
+      setApiUrl(ENDPOINTS.agent);
+    });
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
