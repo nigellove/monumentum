@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase, UserFile, UserProduct } from '../lib/supabase';
 import { generateAiPrompt } from '../lib/generateAiPrompt.ts'
-import { Settings, FileText, BarChart3, Book, Package, LogOut, Download, Calendar, X, ShoppingCart, Save, Link as LinkIcon, Globe, Clock } from 'lucide-react';
-import WidgetCode from '../components/WidgetCode.tsx'
+import { Settings, FileText, BarChart3, Book, Package, LogOut, Download, Calendar, X, ShoppingCart, Save, Link as LinkIcon, Globe, Clock, Briefcase, UserCheck } from 'lucide-react';
+import WidgetCode from '../components/WidgetCode.tsx';
+import CampaignManager from './outbound/CampaignManager';
+import ReviewQueue from './outbound/ReviewQueue';
 
 
 interface UserDashboardProps {
@@ -34,7 +36,7 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
   const [configData, setConfigData] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState<'configure' | 'reports' | 'insights' | 'resources' | 'products' | 'AIWidget' |'subscriptions'>('configure');
+  const [activeTab, setActiveTab] = useState<'configure' | 'reports' | 'insights' | 'resources' | 'products' | 'AIWidget' | 'subscriptions' | 'campaigns' | 'review'>('configure');
   const [conversationStats, setConversationStats] = useState<ConversationStats[]>([]);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelling, setCancelling] = useState(false);
@@ -335,6 +337,8 @@ setFiles(filesWithSignedUrls);
     { id: 'products', label: 'My Products', icon: Package },
     { id: 'AIWidget', label: 'Widget Code', icon: FileText },
     { id: 'subscriptions', label: 'Subscriptions', icon: ShoppingCart },
+    { id: 'campaigns', label: 'Outbound Campaigns', icon: Briefcase },
+    { id: 'review', label: 'Review Queue', icon: UserCheck },
   ];
 
   return (
@@ -425,6 +429,18 @@ setFiles(filesWithSignedUrls);
 
               {activeTab === 'subscriptions' && (
                 <Subscriptions onCancelSubscription={handleCancelClick} />
+              )}
+
+              {activeTab === 'campaigns' && (
+                <div className="max-w-full">
+                  <CampaignManager />
+                </div>
+              )}
+
+              {activeTab === 'review' && (
+                <div className="max-w-full">
+                  <ReviewQueue />
+                </div>
               )}
             </>
           )}
