@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { getCampaigns, OutboundCampaign } from '../../lib/outbound';
@@ -41,9 +41,9 @@ export default function CSVUpload() {
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState('');
 
-  useState(() => {
+  useEffect(() => {
     loadCampaigns();
-  });
+  }, []);
 
   const loadCampaigns = async () => {
     try {
@@ -199,6 +199,7 @@ export default function CSVUpload() {
 
     let successCount = 0;
     let errorCount = 0;
+    const insertedProspectIds: string[] = [];
 
     // Import in batches
     const batchSize = 10;
@@ -234,15 +235,19 @@ export default function CSVUpload() {
       });
 
       try {
-        const { error } = await supabase
+        const { data: insertedData, error } = await supabase
           .from('outbound_prospects')
-          .insert(prospects);
+          .insert(prospects)
+          .select('id');
 
         if (error) {
           console.error('Batch import error:', error);
           errorCount += batch.length;
         } else {
           successCount += batch.length;
+          if (insertedData) {
+            insertedProspectIds.push(...insertedData.map((p: any) => p.id));
+          }
         }
       } catch (err) {
         console.error('Batch import exception:', err);
@@ -251,6 +256,27 @@ export default function CSVUpload() {
 
       setImportProgress({ current: i + batch.length, total: csvData.length });
       setImportResults({ success: successCount, errors: errorCount });
+    }
+
+    // Trigger n8n workflow for each prospect
+    if (insertedProspectIds.length > 0) {
+      const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL;
+      if (webhookUrl) {
+        console.log(`Triggering n8n workflow for ${insertedProspectIds.length} prospects...`);
+
+        // Trigger webhook for each prospect (n8n will handle enrichment + AI generation)
+        for (const prospectId of insertedProspectIds) {
+          try {
+            await fetch(webhookUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ prospect_id: prospectId })
+            });
+          } catch (err) {
+            console.error(`Failed to trigger n8n for prospect ${prospectId}:`, err);
+          }
+        }
+      }
     }
 
     setImporting(false);
