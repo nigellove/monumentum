@@ -1,2 +1,34 @@
+# Environment variables
 .env
+.env.local
+.env.production
+
+# Dependencies
 node_modules
+
+# n8n workflows (contain API keys and credentials)
+n8n-flows/
+
+# Documentation (keep local, may contain sensitive info)
+Docs/
+
+# Build outputs
+dist/
+.vite/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
