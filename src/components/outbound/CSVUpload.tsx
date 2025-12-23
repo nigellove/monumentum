@@ -260,11 +260,11 @@ export default function CSVUpload() {
       setImportResults({ success: successCount, errors: errorCount });
     }
 
-    // Trigger n8n workflow for each prospect
+    // Trigger n8n enrichment workflow for each prospect
     if (insertedProspectIds.length > 0) {
-      const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL;
+      const webhookUrl = import.meta.env.VITE_N8N_ENRICH_WEBHOOK_URL;
       if (webhookUrl) {
-        console.log(`Triggering n8n workflow for ${insertedProspectIds.length} prospects...`);
+        console.log(`Triggering n8n enrichment workflow for ${insertedProspectIds.length} prospects...`);
 
         // Trigger webhook for each prospect (n8n will handle enrichment + AI generation)
         for (const prospectId of insertedProspectIds) {
