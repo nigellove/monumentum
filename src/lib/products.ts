@@ -1,12 +1,15 @@
 export interface Product {
   id: string;
   name: string;
-  price: number;
-  priceId: string;
-  billingCycle: 'monthly' | 'yearly';
+  price: number | null;
+  priceId?: string;
+  billingCycle: 'monthly' | 'yearly' | 'custom';
   description: string;
   features: string[];
-  stripeLink: string;
+  stripeLink?: string;
+  trialDays?: number;
+  monthlyEmailLimit?: number | null;
+  purchaseType?: 'checkout' | 'contact';
 }
 
 export const PRODUCTS: Product[] = [
@@ -26,7 +29,9 @@ export const PRODUCTS: Product[] = [
       'Advanced analytics dashboard',
       'Native multi-language support'
     ],
-    stripeLink: 'https://buy.stripe.com/6oU3cv8oi1icbg41OBdby00'
+    stripeLink: 'https://buy.stripe.com/6oU3cv8oi1icbg41OBdby00',
+    trialDays: 30,
+    purchaseType: 'checkout'
   },
   {
     id: 'customer_service_agent',
@@ -45,7 +50,9 @@ export const PRODUCTS: Product[] = [
       'Customer satisfaction tracking',
       'Native multi-language support'
     ],
-    stripeLink: 'https://buy.stripe.com/fZu8wPgUO8KE6ZO1OBdby01'
+    stripeLink: 'https://buy.stripe.com/fZu8wPgUO8KE6ZO1OBdby01',
+    trialDays: 30,
+    purchaseType: 'checkout'
   },
   {
  id: 'integrated_agent',
@@ -65,8 +72,70 @@ export const PRODUCTS: Product[] = [
       'Native multi-language support'
     ],
     stripeLink: 'https://buy.stripe.com/9B6bJ16ga6Cwesg1OBdby03'  // ← NEW
+  },
+  {
+    id: 'outbound_sales_starter',
+    name: 'Outbound Sales Agent - Starter',
+    price: 39.99,
+    priceId: 'price_outbound_starter_placeholder',
+    billingCycle: 'monthly',
+    description: 'Human-in-the-loop outbound sales with 750 emails per month',
+    features: [
+      'AI personalization with human approval',
+      'Outbound email sequences',
+      'Prospect enrichment',
+      'Campaign review queue',
+      'Email tracking',
+      '750 emails per month'
+    ],
+    stripeLink: '',
+    trialDays: 30,
+    monthlyEmailLimit: 750,
+    purchaseType: 'checkout'
+  },
+  {
+    id: 'outbound_sales_pro',
+    name: 'Outbound Sales Agent - Pro',
+    price: 59.99,
+    priceId: 'price_outbound_pro_placeholder',
+    billingCycle: 'monthly',
+    description: 'Higher volume outbound sales with 2,500 emails per month',
+    features: [
+      'Everything in Starter',
+      'Advanced targeting filters',
+      'Expanded campaign analytics',
+      'Team collaboration',
+      'Priority support',
+      '2,500 emails per month'
+    ],
+    stripeLink: '',
+    trialDays: 30,
+    monthlyEmailLimit: 2500,
+    purchaseType: 'checkout'
+  },
+  {
+    id: 'outbound_sales_enterprise',
+    name: 'Outbound Sales Agent - Enterprise',
+    price: null,
+    billingCycle: 'custom',
+    description: 'Unlimited volume with custom limits and dedicated support',
+    features: [
+      'Unlimited monthly emails',
+      'Custom integrations',
+      'Dedicated deliverability support',
+      'Team-wide analytics',
+      'Custom onboarding',
+      'Service-level agreements'
+    ],
+    trialDays: 30,
+    monthlyEmailLimit: null,
+    purchaseType: 'contact'
   }
 ];
+
+export const CHECKOUT_PRODUCTS = PRODUCTS.filter(
+  (product) => product.purchaseType !== 'contact'
+);
 
 export function getProductById(id: string): Product | undefined {
   return PRODUCTS.find(p => p.id === id);

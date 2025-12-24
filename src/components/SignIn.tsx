@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { X, Mail, Lock, Loader2, ShoppingCart, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { PRODUCTS, type Product } from '../lib/products';
+import { CHECKOUT_PRODUCTS, type Product } from '../lib/products';
 import { supabase } from '../lib/supabase';
 
 interface SignInProps {
@@ -80,6 +80,12 @@ export default function SignIn({ onClose, onSwitchToSignUp }: SignInProps) {
                 timestamp: new Date().toISOString(),
               })
             );
+
+            if (!selectedProduct.stripeLink) {
+              setError('Checkout link not configured yet. Please contact us.');
+              setLoading(false);
+              return;
+            }
 
             const checkoutUrl = `${selectedProduct.stripeLink}?prefilled_email=${encodeURIComponent(email)}`;
             window.location.href = checkoutUrl;
@@ -197,7 +203,7 @@ export default function SignIn({ onClose, onSwitchToSignUp }: SignInProps) {
                   <select
                     id="product"
                     value={selectedProduct?.id || ''}
-                    onChange={(e) => setSelectedProduct(PRODUCTS.find(p => p.id === e.target.value) || null)}
+                    onChange={(e) => setSelectedProduct(CHECKOUT_PRODUCTS.find(p => p.id === e.target.value) || null)}
                     className="w-full pl-11 py-3 border-2 border-slate-200 rounded-lg focus:border-teal-500 focus:outline-none transition-colors appearance-none bg-white text-slate-900 cursor-pointer"
                     style={{
                       backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
@@ -208,7 +214,7 @@ export default function SignIn({ onClose, onSwitchToSignUp }: SignInProps) {
                     }}
                   >
                     <option value="" className="text-slate-900">No purchase (just sign in)</option>
-                    {PRODUCTS.map((product) => (
+                    {CHECKOUT_PRODUCTS.map((product) => (
                       <option key={product.id} value={product.id} className="text-slate-900">
                         {product.name} - ${product.price.toFixed(2)}/{product.billingCycle}
                       </option>

@@ -219,6 +219,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                     <option value="Sales Agent" className="text-slate-900">Inbound Sales Agent</option>
                     <option value="Customer Support Agent" className="text-slate-900">Customer Service Agent</option>
                     <option value="Integrated Agent" className="text-slate-900">Integrated Agent</option>
+                    <option value="Outbound Sales Agent" className="text-slate-900">Outbound Sales Agent</option>
                     <option value="Custom Solution" className="text-slate-900">Custom Solution</option>
                   </select>
                 </div>

@@ -209,6 +209,145 @@ export default function Pricing({ onSignUp, onContactUs }: PricingProps) {
             </button>
           </div>
         </div>
+
+        <div className="mt-16 text-center">
+          <h3 className="text-3xl font-bold text-slate-900 mb-2">
+            Outbound Sales Agent
+          </h3>
+          <p className="text-lg text-slate-600">
+            Human-in-the-loop outbound with a 30-day free trial.
+          </p>
+        </div>
+
+        <div className="mt-10 grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="bg-white rounded-2xl shadow-lg p-8 border-2 border-slate-200 hover:border-slate-300 transition-all">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-2xl font-bold text-slate-900">Starter</h3>
+              <span className="text-xs font-semibold uppercase tracking-wide text-teal-700 bg-teal-50 border border-teal-200 px-2 py-1 rounded-full">
+                30-Day Trial
+              </span>
+            </div>
+            <p className="text-slate-600 mb-6 text-sm">
+              Human-in-the-loop outbound sales for growing teams.
+            </p>
+
+            <div className="mb-8">
+              <div className="flex items-baseline gap-2">
+                <span className="text-5xl font-bold text-slate-900">$39.99</span>
+                <span className="text-slate-600">/mo</span>
+              </div>
+              <p className="text-slate-500 text-sm mt-2">750 emails per month</p>
+            </div>
+
+            <ul className="space-y-3 mb-8">
+              <li className="flex items-start gap-3">
+                <Check className="w-5 h-5 text-teal-500 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-700 text-sm">AI personalization with human approval</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Check className="w-5 h-5 text-teal-500 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-700 text-sm">Prospect enrichment and routing</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Check className="w-5 h-5 text-teal-500 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-700 text-sm">Email tracking and analytics</span>
+              </li>
+            </ul>
+
+            <button
+              onClick={onSignUp}
+              className="w-full py-3 px-6 bg-slate-900 hover:bg-slate-800 text-white rounded-full font-semibold transition-all"
+            >
+              Start 30 Day Free Trial
+            </button>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-2xl p-8 border-2 border-teal-500 relative">
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-teal-500 to-teal-600 text-white px-4 py-1.5 rounded-full text-sm font-bold">
+              Best Value
+            </div>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-2xl font-bold text-slate-900">Pro</h3>
+              <span className="text-xs font-semibold uppercase tracking-wide text-teal-700 bg-teal-50 border border-teal-200 px-2 py-1 rounded-full">
+                30-Day Trial
+              </span>
+            </div>
+            <p className="text-slate-600 mb-6 text-sm">
+              Scale outbound with higher monthly volume and collaboration.
+            </p>
+
+            <div className="mb-8">
+              <div className="flex items-baseline gap-2">
+                <span className="text-5xl font-bold text-slate-900">$59.99</span>
+                <span className="text-slate-600">/mo</span>
+              </div>
+              <p className="text-slate-500 text-sm mt-2">2,500 emails per month</p>
+            </div>
+
+            <ul className="space-y-3 mb-8">
+              <li className="flex items-start gap-3">
+                <Check className="w-5 h-5 text-teal-500 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-700 text-sm">Everything in Starter</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Check className="w-5 h-5 text-teal-500 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-700 text-sm">Advanced targeting and filters</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Check className="w-5 h-5 text-teal-500 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-700 text-sm">Priority support and reporting</span>
+              </li>
+            </ul>
+
+            <button
+              onClick={onSignUp}
+              className="w-full py-3 px-6 bg-teal-500 hover:bg-teal-600 text-white rounded-full font-semibold transition-all"
+            >
+              Start 30 Day Free Trial
+            </button>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-lg p-8 border-2 border-slate-200 hover:border-slate-300 transition-all">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-2xl font-bold text-slate-900">Enterprise</h3>
+              <span className="text-xs font-semibold uppercase tracking-wide text-teal-700 bg-teal-50 border border-teal-200 px-2 py-1 rounded-full">
+                30-Day Trial
+              </span>
+            </div>
+            <p className="text-slate-600 mb-6 text-sm">
+              Unlimited volume, advanced support, and custom integrations.
+            </p>
+
+            <div className="mb-8">
+              <div className="flex items-baseline gap-2">
+                <span className="text-4xl font-bold text-slate-900">Contact Us</span>
+              </div>
+              <p className="text-slate-500 text-sm mt-2">Custom limits and pricing</p>
+            </div>
+
+            <ul className="space-y-3 mb-8">
+              <li className="flex items-start gap-3">
+                <Check className="w-5 h-5 text-teal-500 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-700 text-sm">Unlimited monthly emails</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Check className="w-5 h-5 text-teal-500 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-700 text-sm">Dedicated deliverability support</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Check className="w-5 h-5 text-teal-500 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-700 text-sm">Custom onboarding and integrations</span>
+              </li>
+            </ul>
+
+            <button
+              onClick={onContactUs}
+              className="w-full py-3 px-6 bg-slate-900 hover:bg-slate-800 text-white rounded-full font-semibold transition-all"
+            >
+              Contact Sales
+            </button>
+          </div>
+        </div>
       </div>
     </section>
   );

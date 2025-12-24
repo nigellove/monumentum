@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { X, Mail, Lock, Loader2, ShoppingCart, Check } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { PRODUCTS, type Product } from '../lib/products';
+import { CHECKOUT_PRODUCTS, type Product } from '../lib/products';
 import { supabase } from '../lib/supabase';
 
 interface SignUpProps {
@@ -155,6 +155,12 @@ export default function SignUp({ onClose, onSwitchToSignIn }: SignUpProps) {
             })
           );
 
+          if (!selectedProduct.stripeLink) {
+            setError('Checkout link not configured yet. Please contact us.');
+            setLoading(false);
+            return;
+          }
+
           const checkoutUrl = `${selectedProduct.stripeLink}?prefilled_email=${encodeURIComponent(email)}`;
           window.location.href = checkoutUrl;
         } catch (err: any) {
@@ -270,7 +276,7 @@ export default function SignUp({ onClose, onSwitchToSignIn }: SignUpProps) {
                 Choose Your Plan
               </label>
               <div className="space-y-3">
-                {PRODUCTS.map((product) => (
+                {CHECKOUT_PRODUCTS.map((product) => (
                   <label
                     key={product.id}
                     className="flex items-start p-4 border-2 border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors has-[:checked]:border-teal-500 has-[:checked]:bg-teal-50"
@@ -342,7 +348,7 @@ export default function SignUp({ onClose, onSwitchToSignIn }: SignUpProps) {
                   Creating Account...
                 </>
               ) : (
-                'Continue to Payment →'
+                'Continue to Payment'
               )}
             </button>
           </form>
@@ -359,7 +365,7 @@ export default function SignUp({ onClose, onSwitchToSignIn }: SignUpProps) {
 
           <div className="mt-6 text-center">
             <p className="text-xs text-slate-500">
-              🔒 Secured by Stripe • Your information is encrypted
+              Secured by Stripe. Your information is encrypted.
             </p>
           </div>
         </div>

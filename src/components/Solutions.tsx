@@ -1,4 +1,4 @@
-import { Bot, Headphones, Users, PhoneIncoming, UserCog, GraduationCap } from 'lucide-react';
+import { Bot, Headphones, Users, PhoneIncoming, UserCog, GraduationCap, LineChart } from 'lucide-react';
 import { useState } from 'react';
 
 interface SolutionsProps {
@@ -61,20 +61,64 @@ export default function Solutions({ onContactUs, onOpenChat, onSignUp }: Solutio
         'Native multi-language support',
       ],
     },
+    {
+      icon: PhoneIncoming,
+      title: 'Outbound Sales Agent - Starter',
+      description: 'Human-in-the-loop outbound for early teams getting consistent pipeline.',
+      price: 'Starting at $39.99/mo',
+      available: true,
+      features: [
+        'AI personalization with human approval',
+        'Prospect enrichment and routing',
+        'Review queue with bulk actions',
+        'Email tracking and reporting',
+        '750 emails per month',
+        'Single reviewer workflow',
+        'Core integrations',
+      ],
+    },
+    {
+      icon: Users,
+      title: 'Outbound Sales Agent - Pro',
+      description: 'Higher volume outbound with collaboration and advanced targeting.',
+      price: 'Starting at $59.99/mo',
+      available: true,
+      features: [
+        'Everything in Starter',
+        '2,500 emails per month',
+      ],
+    },
+    {
+      icon: UserCog,
+      title: 'Outbound Sales Agent - Enterprise',
+      description: 'Custom limits, dedicated support, and tailored integrations.',
+      price: 'Contact Us',
+      available: true,
+      cta: 'contact',
+      features: [
+        'Unlimited monthly emails',
+        'Dedicated deliverability support',
+        'Custom onboarding and training',
+        'Advanced analytics and reporting',
+        'Custom integrations',
+        'SLA and account management',
+        'Security and compliance support',
+      ],
+    },
   ];
 
   const comingSoonSolutions = [
     {
-      icon: PhoneIncoming,
-      title: 'Outbound Sales Agent',
+      icon: GraduationCap,
+      title: 'Business Training Agent',
+    },
+    {
+      icon: LineChart,
+      title: 'Agent Assisted SEO',
     },
     {
       icon: UserCog,
       title: 'Employee Support Agent',
-    },
-    {
-      icon: GraduationCap,
-      title: 'Business Training Agent',
     },
   ];
 
@@ -118,12 +162,21 @@ export default function Solutions({ onContactUs, onOpenChat, onSignUp }: Solutio
                   What's Included
                 </button>
                 {solution.available ? (
-                  <button
-                    onClick={onSignUp}
-                    className="w-full px-6 py-3 bg-slate-900 text-white rounded-full font-semibold hover:bg-slate-800 transition-all"
-                  >
-                    Sign Up
-                  </button>
+                  solution.cta === 'contact' ? (
+                    <button
+                      onClick={onContactUs}
+                      className="w-full px-6 py-3 bg-slate-900 text-white rounded-full font-semibold hover:bg-slate-800 transition-all"
+                    >
+                      Contact Us
+                    </button>
+                  ) : (
+                    <button
+                      onClick={onSignUp}
+                      className="w-full px-6 py-3 bg-slate-900 text-white rounded-full font-semibold hover:bg-slate-800 transition-all"
+                    >
+                      Sign Up
+                    </button>
+                  )
                 ) : (
                   <button
                     disabled

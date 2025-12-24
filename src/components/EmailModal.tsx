@@ -119,6 +119,7 @@ export default function EmailModal({ isOpen, onClose }: EmailModalProps) {
                   <option value="" className="text-slate-900">Select a product</option>
                   <option value="Sales Agent" className="text-slate-900">Sales Agent</option>
                   <option value="Customer Support Agent" className="text-slate-900">Customer Support Agent</option>
+                  <option value="Outbound Sales Agent" className="text-slate-900">Outbound Sales Agent</option>
                   <option value="Employee Support Agent" className="text-slate-900">Employee Support Agent</option>
                   <option value="Custom Solution" className="text-slate-900">Custom Solution</option>
                 </select>
