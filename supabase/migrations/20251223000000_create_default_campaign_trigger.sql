@@ -9,7 +9,14 @@ RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
+DECLARE
+  v_user_email TEXT;
 BEGIN
+  -- Get user's email from auth.users
+  SELECT email INTO v_user_email
+  FROM auth.users
+  WHERE id = NEW.user_id;
+
   -- Create a default campaign for the new business profile
   INSERT INTO outbound_campaigns (
     user_id,
@@ -17,7 +24,11 @@ BEGIN
     campaign_name,
     target_product,
     target_icp,
-    status
+    status,
+    sender_name,
+    reply_to_email,
+    calendar_link,
+    email_signature
   ) VALUES (
     NEW.user_id,
     NEW.customer_id,
@@ -37,7 +48,11 @@ BEGIN
         'Chief Financial Officer'
       ]
     ),
-    'draft'
+    'draft',
+    NEW.business_name, -- Default sender name from business profile
+    COALESCE(NEW.business_email, v_user_email), -- Reply-to email (user's email)
+    NULL, -- No default calendar link
+    NULL  -- No default signature
   );
 
   RETURN NEW;
@@ -60,6 +75,7 @@ CREATE TRIGGER trigger_create_default_campaign
 DO $$
 DECLARE
   profile_record RECORD;
+  v_user_email TEXT;
 BEGIN
   FOR profile_record IN
     SELECT DISTINCT bp.user_id, bp.customer_id
@@ -69,14 +85,24 @@ BEGIN
       AND oc.campaign_name = 'Default Campaign'
     WHERE oc.id IS NULL
   LOOP
+    -- Get user's email for this profile
+    SELECT email INTO v_user_email
+    FROM auth.users
+    WHERE id = profile_record.user_id;
+
     INSERT INTO outbound_campaigns (
       user_id,
       customer_id,
       campaign_name,
       target_product,
       target_icp,
-      status
-    ) VALUES (
+      status,
+      sender_name,
+      reply_to_email,
+      calendar_link,
+      email_signature
+    )
+    SELECT
       profile_record.user_id,
       profile_record.customer_id,
       'Default Campaign',
@@ -95,8 +121,14 @@ BEGIN
           'Chief Financial Officer'
         ]
       ),
-      'draft'
-    );
+      'draft',
+      bp.business_name, -- Get sender name from business profile
+      COALESCE(bp.business_email, v_user_email), -- Reply-to email (user's email)
+      NULL, -- No calendar link
+      NULL  -- No signature
+    FROM business_profiles bp
+    WHERE bp.user_id = profile_record.user_id
+    LIMIT 1;
   END LOOP;
 END;
 $$;

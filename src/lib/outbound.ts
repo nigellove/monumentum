@@ -12,6 +12,13 @@ export interface OutboundCampaign {
   target_product: string | null;
   target_icp: Record<string, any>;
   status: 'draft' | 'active' | 'paused' | 'completed';
+
+  // Email settings (SaaS model - emails sent via Monumentum infrastructure)
+  sender_name: string | null;
+  reply_to_email: string | null;
+  calendar_link: string | null;
+  email_signature: string | null;
+
   created_at: string;
   updated_at: string;
 }

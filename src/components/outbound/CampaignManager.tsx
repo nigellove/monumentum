@@ -8,7 +8,7 @@ import {
   deleteCampaign,
   OutboundCampaign
 } from '../../lib/outbound';
-import { Plus, Edit2, Trash2, Play, Pause, CheckCircle, Sparkles } from 'lucide-react';
+import { Plus, Edit2, Trash2, Play, Pause, CheckCircle, Sparkles, Upload, AlertTriangle, BarChart3 } from 'lucide-react';
 
 export default function CampaignManager() {
   const { user } = useAuth();
@@ -17,6 +17,7 @@ export default function CampaignManager() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingCampaign, setEditingCampaign] = useState<OutboundCampaign | null>(null);
   const [generatingProspects, setGeneratingProspects] = useState<string | null>(null);
+  const [prospectLimit, setProspectLimit] = useState(25);
 
   useEffect(() => {
     loadCampaigns();
@@ -61,7 +62,7 @@ export default function CampaignManager() {
 
   const handleGenerateProspects = async (campaign: OutboundCampaign, limit: number = 25) => {
     if (!user?.id || !campaign.target_icp) {
-      alert('Campaign must have ICP targeting configured');
+      alert('Campaign must have target audience configured');
       return;
     }
 
@@ -131,7 +132,7 @@ export default function CampaignManager() {
   return (
     <div className="max-w-7xl mx-auto p-8">
       {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 mb-2">Campaign Management</h1>
           <p className="text-slate-600">Create and manage your outbound sales campaigns</p>
@@ -143,6 +144,72 @@ export default function CampaignManager() {
           <Plus className="w-5 h-5" />
           New Campaign
         </button>
+      </div>
+
+      {/* Instructions Banner */}
+      <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+          <Sparkles className="w-5 h-5 text-blue-600" />
+          How Campaign Generation Works
+        </h3>
+        <div className="grid md:grid-cols-4 gap-4 mb-4">
+          <div className="bg-white rounded-lg p-4 border border-blue-100">
+            <div className="text-2xl font-bold text-blue-600 mb-2">1</div>
+            <p className="text-sm font-semibold text-slate-900 mb-1">Create Campaign</p>
+            <p className="text-xs text-slate-600">Define your target audience criteria</p>
+          </div>
+          <div className="bg-white rounded-lg p-4 border border-blue-100">
+            <div className="text-2xl font-bold text-blue-600 mb-2">2</div>
+            <p className="text-sm font-semibold text-slate-900 mb-1">Generate Prospects</p>
+            <p className="text-xs text-slate-600">AI finds matching prospects automatically</p>
+          </div>
+          <div className="bg-white rounded-lg p-4 border border-blue-100">
+            <div className="text-2xl font-bold text-blue-600 mb-2">3</div>
+            <p className="text-sm font-semibold text-slate-900 mb-1">Review & Approve</p>
+            <p className="text-xs text-slate-600">Check AI-generated messages in review queue</p>
+          </div>
+          <div className="bg-white rounded-lg p-4 border border-blue-100">
+            <div className="text-2xl font-bold text-blue-600 mb-2">4</div>
+            <p className="text-sm font-semibold text-slate-900 mb-1">Send</p>
+            <p className="text-xs text-slate-600">Approved messages go to send queue</p>
+          </div>
+        </div>
+        <div className="bg-white rounded-lg p-4 border border-blue-200">
+          <p className="text-sm text-slate-700">
+            <Upload className="w-4 h-4 inline mr-1 text-blue-600" />
+            <span className="font-semibold">Alternative:</span> If you already have a list of proposed targets, you can upload them via the <span className="font-bold text-blue-700">Upload Prospects</span> tab and then use the campaign tool to automatically generate the tailored emails.
+          </p>
+        </div>
+      </div>
+
+      {/* Rate Limits */}
+      <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
+        <h3 className="text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
+          <BarChart3 className="w-4 h-4 text-green-600" />
+          Daily Email Sending Limits
+        </h3>
+        <div className="grid md:grid-cols-3 gap-3 text-sm">
+          <div className="bg-white rounded px-3 py-2 border border-green-100">
+            <span className="font-semibold text-slate-700">Basic:</span> <span className="text-green-700 font-bold">50 emails/day</span>
+          </div>
+          <div className="bg-white rounded px-3 py-2 border border-green-100">
+            <span className="font-semibold text-slate-700">Pro:</span> <span className="text-green-700 font-bold">200 emails/day</span>
+          </div>
+          <div className="bg-white rounded px-3 py-2 border border-green-100">
+            <span className="font-semibold text-slate-700">Enterprise:</span> <span className="text-green-700 font-bold">Unlimited</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Terms of Service Disclaimer */}
+      <div className="mb-6 bg-yellow-50 border border-yellow-300 rounded-lg p-4">
+        <p className="text-sm text-slate-800 flex items-start gap-2">
+          <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+          <span>
+            <span className="font-semibold">Important:</span> Using this platform to promote any form of discriminatory or illegal content will not be tolerated and will lead to closure of your account.{' '}
+            <a href="/terms" className="text-blue-600 underline font-semibold hover:text-blue-800">See terms of service</a>
+          </span>
+        </p>
       </div>
 
       {/* Campaigns List */}
@@ -210,7 +277,7 @@ export default function CampaignManager() {
 
                 {campaign.target_icp && Object.keys(campaign.target_icp).length > 0 && (
                   <div>
-                    <span className="font-semibold">Target ICP:</span>
+                    <span className="font-semibold">Target Audience:</span>
                     <ul className="ml-4 mt-1 space-y-1">
                       {campaign.target_icp.industries && (
                         <li>Industries: {campaign.target_icp.industries.join(', ')}</li>
@@ -233,29 +300,47 @@ export default function CampaignManager() {
               </div>
 
               {/* Actions */}
-              <div className="mt-6 pt-4 border-t border-slate-200 flex flex-col gap-2">
-                <div className="flex gap-2">
-                  {[5, 10, 25, 50].map((limit) => (
-                    <button
-                      key={limit}
-                      onClick={() => handleGenerateProspects(campaign, limit)}
+              <div className="mt-6 pt-4 border-t border-slate-200 flex flex-col gap-3">
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-700">
+                    Number of Prospects to Generate
+                  </label>
+                  <div className="flex gap-2">
+                    <select
+                      value={prospectLimit}
+                      onChange={(e) => setProspectLimit(parseInt(e.target.value))}
+                      className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                       disabled={generatingProspects === campaign.id}
-                      className="flex-1 py-2 px-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg text-sm font-semibold transition hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"
+                    >
+                      <option value="5">5 prospects</option>
+                      <option value="10">10 prospects</option>
+                      <option value="25">25 prospects (recommended)</option>
+                      <option value="50">50 prospects</option>
+                      <option value="75">75 prospects</option>
+                      <option value="100">100 prospects</option>
+                    </select>
+                    <button
+                      onClick={() => handleGenerateProspects(campaign, prospectLimit)}
+                      disabled={generatingProspects === campaign.id}
+                      className="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg text-sm font-semibold transition hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[140px]"
                     >
                       {generatingProspects === campaign.id ? (
-                        <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          Generating...
+                        </>
                       ) : (
                         <>
-                          <Sparkles className="w-3 h-3" />
-                          {limit}
+                          <Sparkles className="w-4 h-4" />
+                          Generate
                         </>
                       )}
                     </button>
-                  ))}
+                  </div>
+                  <p className="text-xs text-slate-500">
+                    AI will automatically find and generate personalized messages for prospects matching your target audience
+                  </p>
                 </div>
-                <p className="text-xs text-slate-500 text-center">
-                  Generate prospects matching your ICP
-                </p>
                 <button
                   onClick={() => handleStatusToggle(campaign)}
                   className={`w-full py-2 px-4 rounded-lg font-semibold transition ${
@@ -264,7 +349,7 @@ export default function CampaignManager() {
                       : 'bg-green-100 text-green-800 hover:bg-green-200'
                   }`}
                 >
-                  {campaign.status === 'active' ? 'Pause' : 'Activate'}
+                  {campaign.status === 'active' ? 'Pause Campaign' : 'Activate Campaign'}
                 </button>
               </div>
             </div>
@@ -299,6 +384,7 @@ interface CampaignModalProps {
 }
 
 function CampaignModal({ campaign, onClose, onSave }: CampaignModalProps) {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     campaign_name: campaign?.campaign_name || '',
     target_product: campaign?.target_product || '',
@@ -307,8 +393,41 @@ function CampaignModal({ campaign, onClose, onSave }: CampaignModalProps) {
     company_size_max: campaign?.target_icp?.company_size?.[1] || 10000,
     job_titles: campaign?.target_icp?.job_titles?.join(', ') || '',
     status: campaign?.status || 'draft',
+    sender_name: campaign?.sender_name || '',
+    reply_to_email: campaign?.reply_to_email || '',
+    calendar_link: campaign?.calendar_link || '',
+    email_signature: campaign?.email_signature || '',
   });
   const [saving, setSaving] = useState(false);
+
+  // Auto-populate sender fields from user profile on mount for new campaigns
+  useEffect(() => {
+    if (!campaign) {
+      supabase.auth.getUser().then(({ data }) => {
+        if (data.user) {
+          setFormData(prev => ({
+            ...prev,
+            reply_to_email: prev.reply_to_email || data.user.email || '',
+          }));
+        }
+      });
+
+      supabase
+        .from('business_profiles')
+        .select('business_name, business_email')
+        .eq('user_id', user?.id)
+        .single()
+        .then(({ data }) => {
+          if (data) {
+            setFormData(prev => ({
+              ...prev,
+              sender_name: prev.sender_name || data.business_name || '',
+              reply_to_email: prev.reply_to_email || data.business_email || prev.reply_to_email,
+            }));
+          }
+        });
+    }
+  }, [campaign, user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -324,6 +443,10 @@ function CampaignModal({ campaign, onClose, onSave }: CampaignModalProps) {
           job_titles: formData.job_titles.split(',').map(s => s.trim()).filter(Boolean),
         },
         status: formData.status as 'draft' | 'active' | 'paused' | 'completed',
+        sender_name: formData.sender_name || null,
+        reply_to_email: formData.reply_to_email || null,
+        calendar_link: formData.calendar_link || null,
+        email_signature: formData.email_signature || null,
       };
 
       if (campaign) {
@@ -378,9 +501,10 @@ function CampaignModal({ campaign, onClose, onSave }: CampaignModalProps) {
             />
           </div>
 
-          {/* Target ICP */}
+          {/* Target Audience */}
           <div className="bg-slate-50 p-4 rounded-lg space-y-4">
-            <h3 className="font-semibold text-slate-900">Target ICP (Ideal Customer Profile)</h3>
+            <h3 className="font-semibold text-slate-900">Target Audience</h3>
+            <p className="text-xs text-slate-600">Define the characteristics of prospects you want to reach</p>
 
             {/* Industries */}
             <div>
@@ -436,6 +560,74 @@ function CampaignModal({ campaign, onClose, onSave }: CampaignModalProps) {
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="VP of HR, Chief People Officer, HR Director"
               />
+            </div>
+          </div>
+
+          {/* Email Settings */}
+          <div className="bg-blue-50 p-4 rounded-lg space-y-4 border border-blue-200">
+            <div>
+              <h3 className="font-semibold text-slate-900">Email Settings</h3>
+              <p className="text-xs text-slate-600 mt-1">Emails are sent via Monumentum infrastructure. Prospect replies go directly to your inbox.</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Sender Name *
+              </label>
+              <input
+                type="text"
+                value={formData.sender_name}
+                onChange={(e) => setFormData({ ...formData, sender_name: e.target.value })}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="John Smith"
+                required
+              />
+              <p className="text-xs text-slate-500 mt-1">
+                Appears as: <span className="font-mono bg-white px-2 py-0.5 rounded">"{formData.sender_name || 'Your Name'}" via Monumentum &lt;hello@monumentum.com&gt;</span>
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Reply-To Email *
+              </label>
+              <input
+                type="email"
+                value={formData.reply_to_email}
+                onChange={(e) => setFormData({ ...formData, reply_to_email: e.target.value })}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="john@company.com"
+                required
+              />
+              <p className="text-xs text-slate-500 mt-1">When prospects reply, their response will be sent directly to this email address</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Calendar/Meeting Link (Optional)
+              </label>
+              <input
+                type="url"
+                value={formData.calendar_link}
+                onChange={(e) => setFormData({ ...formData, calendar_link: e.target.value })}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="https://calendly.com/yourname or https://cal.com/yourname"
+              />
+              <p className="text-xs text-slate-500 mt-1">AI will include this in generated emails for easy booking</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Email Signature (Optional)
+              </label>
+              <textarea
+                value={formData.email_signature}
+                onChange={(e) => setFormData({ ...formData, email_signature: e.target.value })}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                rows={3}
+                placeholder="Best regards,&#10;John Smith&#10;VP of Sales&#10;Company Name"
+              />
+              <p className="text-xs text-slate-500 mt-1">Appended to all emails in this campaign</p>
             </div>
           </div>
 
