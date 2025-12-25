@@ -40,10 +40,12 @@ export default function EmailModal({ isOpen, onClose }: EmailModalProps) {
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center sm:p-4">
       <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:w-full sm:max-w-md flex flex-col">
-        <div className="bg-gradient-to-r from-cyan-500 to-blue-600 p-4 rounded-t-2xl flex items-center justify-between">
+        <div className="bg-gradient-to-r from-teal-500 to-teal-600 p-4 rounded-t-2xl flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Mail className="w-6 h-6 text-white" />
-            <h3 className="text-white font-semibold text-lg">Contact Us</h3>
+            <h3 className="text-white font-semibold text-lg" style={{ fontFamily: 'Audiowide, sans-serif' }}>
+              Contact Us
+            </h3>
           </div>
           <button
             onClick={onClose}
@@ -77,7 +79,7 @@ export default function EmailModal({ isOpen, onClose }: EmailModalProps) {
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                   placeholder="Your name"
                 />
               </div>
@@ -93,7 +95,7 @@ export default function EmailModal({ isOpen, onClose }: EmailModalProps) {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                   placeholder="your@email.com"
                 />
               </div>
@@ -107,7 +109,7 @@ export default function EmailModal({ isOpen, onClose }: EmailModalProps) {
                   name="product"
                   value={formData.product}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent bg-white text-slate-900 appearance-none cursor-pointer"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white text-slate-900 appearance-none cursor-pointer"
                   style={{
                     backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
                     backgroundPosition: 'right 0.5rem center',
@@ -136,14 +138,14 @@ export default function EmailModal({ isOpen, onClose }: EmailModalProps) {
                   value={formData.message}
                   onChange={handleChange}
                   rows={4}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent resize-none"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent resize-none"
                   placeholder="How can we help you?"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all"
+                className="w-full px-6 py-3 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all"
               >
                 Send Email
               </button>

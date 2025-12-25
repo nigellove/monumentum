@@ -77,6 +77,7 @@ export const PRODUCTS: Product[] = [
     id: 'outbound_sales_starter',
     name: 'Outbound Sales Agent - Starter',
     price: 39.99,
+    // TODO: Replace outbound placeholder Stripe IDs/links with real products before launch.
     priceId: 'price_outbound_starter_placeholder',
     billingCycle: 'monthly',
     description: 'Human-in-the-loop outbound sales with 750 emails per month',

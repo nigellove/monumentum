@@ -1,7 +1,7 @@
 import { Check, Zap } from 'lucide-react';
 
 interface PricingProps {
-  onSignUp: () => void;
+  onSignUp: (productId: string) => void;
   onContactUs: () => void;
 }
 
@@ -58,7 +58,7 @@ export default function Pricing({ onSignUp, onContactUs }: PricingProps) {
             </ul>
 
             <button
-              onClick={onSignUp}
+              onClick={() => onSignUp('inbound_sales_agent')}
               className="w-full py-3 px-6 bg-slate-900 hover:bg-slate-800 text-white rounded-full font-semibold transition-all"
             >
               Start 30 Day Free Trial
@@ -104,7 +104,7 @@ export default function Pricing({ onSignUp, onContactUs }: PricingProps) {
             </ul>
 
             <button
-              onClick={onSignUp}
+              onClick={() => onSignUp('customer_service_agent')}
               className="w-full py-3 px-6 bg-slate-900 hover:bg-slate-800 text-white rounded-full font-semibold transition-all"
             >
               Start 30 Day Free Trial
@@ -153,7 +153,7 @@ export default function Pricing({ onSignUp, onContactUs }: PricingProps) {
             </ul>
 
             <button
-              onClick={onSignUp}
+              onClick={() => onSignUp('integrated_agent')}
               className="w-full py-3 px-6 bg-teal-500 hover:bg-teal-600 text-white rounded-full font-semibold transition-all"
             >
               Start 30 Day Free Trial
@@ -255,7 +255,7 @@ export default function Pricing({ onSignUp, onContactUs }: PricingProps) {
             </ul>
 
             <button
-              onClick={onSignUp}
+              onClick={() => onSignUp('outbound_sales_starter')}
               className="w-full py-3 px-6 bg-slate-900 hover:bg-slate-800 text-white rounded-full font-semibold transition-all"
             >
               Start 30 Day Free Trial
@@ -273,7 +273,7 @@ export default function Pricing({ onSignUp, onContactUs }: PricingProps) {
               </span>
             </div>
             <p className="text-slate-600 mb-6 text-sm">
-              Scale outbound with higher monthly volume and collaboration.
+              Scale outbound with &gt;3X Outbound Sales Leads
             </p>
 
             <div className="mb-8">
@@ -291,16 +291,12 @@ export default function Pricing({ onSignUp, onContactUs }: PricingProps) {
               </li>
               <li className="flex items-start gap-3">
                 <Check className="w-5 h-5 text-teal-500 flex-shrink-0 mt-0.5" />
-                <span className="text-slate-700 text-sm">Advanced targeting and filters</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <Check className="w-5 h-5 text-teal-500 flex-shrink-0 mt-0.5" />
-                <span className="text-slate-700 text-sm">Priority support and reporting</span>
+                <span className="text-slate-700 text-sm">2500 emails per month</span>
               </li>
             </ul>
 
             <button
-              onClick={onSignUp}
+              onClick={() => onSignUp('outbound_sales_pro')}
               className="w-full py-3 px-6 bg-teal-500 hover:bg-teal-600 text-white rounded-full font-semibold transition-all"
             >
               Start 30 Day Free Trial

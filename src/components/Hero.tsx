@@ -3,7 +3,7 @@ import { ArrowRight } from 'lucide-react';
 
 interface HeroProps {
   onGetStarted: () => void;
-  onSignUp: () => void;
+  onSignUp: (productId?: string) => void;
   onOpenChat: () => void;
 }
 

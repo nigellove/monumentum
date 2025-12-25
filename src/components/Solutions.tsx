@@ -4,7 +4,7 @@ import { useState } from 'react';
 interface SolutionsProps {
   onContactUs: () => void;
   onOpenChat: () => void;
-  onSignUp: () => void;
+  onSignUp: (productId?: string) => void;
 }
 
 export default function Solutions({ onContactUs, onOpenChat, onSignUp }: SolutionsProps) {
@@ -16,6 +16,7 @@ export default function Solutions({ onContactUs, onOpenChat, onSignUp }: Solutio
       title: 'Inbound Sales and Lead Capture Agent',
       description: 'Streamline customer interactions and fully automate lead capture. Convert more prospects into customers 24/7.',
       price: 'Starting at $299/mo',
+      productId: 'inbound_sales_agent',
       available: true,
       features: [
         '24/7 automated lead capture',
@@ -32,6 +33,7 @@ export default function Solutions({ onContactUs, onOpenChat, onSignUp }: Solutio
       title: 'Inbound Customer Service Agent',
       description: 'Answer customer questions instantly and set up appointments automatically. Enhance satisfaction and reduce response times.',
       price: 'Starting at $249/mo',
+      productId: 'customer_service_agent',
       available: true,
       features: [
         'Instant response system',
@@ -49,6 +51,7 @@ export default function Solutions({ onContactUs, onOpenChat, onSignUp }: Solutio
       title: 'Integrated Inbound Sales, Lead Capture and Customer Service Agent',
       description: 'Complete solution combining sales, lead capture, and customer service in one powerful AI agent. Maximize efficiency and customer satisfaction.',
       price: 'Starting at $399/mo',
+      productId: 'integrated_agent',
       available: true,
       features: [
         'All Sales Agent features',
@@ -66,6 +69,7 @@ export default function Solutions({ onContactUs, onOpenChat, onSignUp }: Solutio
       title: 'Outbound Sales Agent - Starter',
       description: 'Human-in-the-loop outbound for early teams getting consistent pipeline.',
       price: 'Starting at $39.99/mo',
+      productId: 'outbound_sales_starter',
       available: true,
       features: [
         'AI personalization with human approval',
@@ -82,6 +86,7 @@ export default function Solutions({ onContactUs, onOpenChat, onSignUp }: Solutio
       title: 'Outbound Sales Agent - Pro',
       description: 'Higher volume outbound with collaboration and advanced targeting.',
       price: 'Starting at $59.99/mo',
+      productId: 'outbound_sales_pro',
       available: true,
       features: [
         'Everything in Starter',
@@ -171,7 +176,7 @@ export default function Solutions({ onContactUs, onOpenChat, onSignUp }: Solutio
                     </button>
                   ) : (
                     <button
-                      onClick={onSignUp}
+                      onClick={() => onSignUp(solution.productId)}
                       className="w-full px-6 py-3 bg-slate-900 text-white rounded-full font-semibold hover:bg-slate-800 transition-all"
                     >
                       Sign Up

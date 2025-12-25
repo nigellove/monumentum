@@ -32,6 +32,7 @@ function AppContent() {
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const [isSignInOpen, setIsSignInOpen] = useState(false);
   const [isSignUpOpen, setIsSignUpOpen] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [isDashboardOpen, setIsDashboardOpen] = useState(false);
   const [isDocsOpen, setIsDocsOpen] = useState(false);
   const [docsSection, setDocsSection] = useState<'installation' | 'customization' | 'integration'>('installation');
@@ -142,6 +143,11 @@ useEffect(() => {
     }
   };
 
+  const handleSignUp = (productId?: string) => {
+    setSelectedProductId(productId ?? null);
+    setIsSignUpOpen(true);
+  };
+
   const handleOpenDashboard = () => {
     setIsDashboardOpen(true);
   };
@@ -213,16 +219,16 @@ useEffect(() => {
         onOpenDashboard={handleOpenDashboard}
       />
       <FloatingBadge onOpenChat={handleOpenChat} />
-      <Hero onGetStarted={handleGetStarted} onSignUp={() => setIsSignUpOpen(true)} 
+      <Hero onGetStarted={handleGetStarted} onSignUp={handleSignUp} 
         onOpenChat={() => setIsChatOpen(true)}/>
       <Solutions
         onContactUs={handleContactUs}
         onOpenChat={handleOpenChat}
-        onSignUp={() => setIsSignUpOpen(true)}
+        onSignUp={handleSignUp}
         //onOpenChat={() => setIsChatOpen(true)}
       />
       <Services onContactUs={handleContactUs} onOpenChat={handleOpenChat} />
-      <Pricing onSignUp={() => setIsSignUpOpen(true)} onContactUs={handleContactUs} />
+      <Pricing onSignUp={handleSignUp} onContactUs={handleContactUs} />
       <About />
       <FAQ />
       <Contact onOpenChat={handleOpenChat} />
@@ -257,11 +263,15 @@ useEffect(() => {
 
       {isSignUpOpen && (
         <SignUp
-          onClose={() => setIsSignUpOpen(false)}
+          onClose={() => {
+            setIsSignUpOpen(false);
+            setSelectedProductId(null);
+          }}
           onSwitchToSignIn={() => {
             setIsSignUpOpen(false);
             setIsSignInOpen(true);
           }}
+          initialProductId={selectedProductId}
         />
       )}
 

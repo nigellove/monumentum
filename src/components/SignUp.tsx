@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X, Mail, Lock, Loader2, ShoppingCart, Check } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { CHECKOUT_PRODUCTS, type Product } from '../lib/products';
@@ -7,9 +7,10 @@ import { supabase } from '../lib/supabase';
 interface SignUpProps {
   onClose: () => void;
   onSwitchToSignIn: () => void;
+  initialProductId?: string | null;
 }
 
-export default function SignUp({ onClose, onSwitchToSignIn }: SignUpProps) {
+export default function SignUp({ onClose, onSwitchToSignIn, initialProductId }: SignUpProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -19,6 +20,18 @@ export default function SignUp({ onClose, onSwitchToSignIn }: SignUpProps) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { signUp } = useAuth();
+
+  useEffect(() => {
+    if (!initialProductId) {
+      setSelectedProduct(null);
+      return;
+    }
+
+    const matchedProduct = CHECKOUT_PRODUCTS.find(
+      (product) => product.id === initialProductId
+    );
+    setSelectedProduct(matchedProduct ?? null);
+  }, [initialProductId]);
 
   const validatePassword = (pwd: string): string | null => {
     if (pwd.length < 8) {
