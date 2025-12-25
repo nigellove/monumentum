@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
     // Fetch campaign data (for sender name and reply-to)
     const { data: campaign, error: campaignError } = await supabase
       .from('outbound_campaigns')
-      .select('sender_name, reply_to_email, email_signature')
+      .select('sender_name, reply_to_email, email_signature, customer_id')
       .eq('id', campaign_id)
       .eq('user_id', user_id)
       .single();
@@ -80,6 +80,21 @@ Deno.serve(async (req) => {
         details: campaignError?.message
       }), {
         status: 404,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // CRITICAL: Verify tenant isolation - campaign and prospect must have same customer_id
+    if (campaign.customer_id !== prospect.customer_id) {
+      console.error('Tenant isolation violation detected:', {
+        campaign_customer_id: campaign.customer_id,
+        prospect_customer_id: prospect.customer_id,
+        user_id: user_id
+      });
+      return new Response(JSON.stringify({
+        error: 'Access denied: Tenant isolation violation'
+      }), {
+        status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
