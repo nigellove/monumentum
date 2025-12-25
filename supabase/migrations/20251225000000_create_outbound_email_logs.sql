@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS outbound_email_logs (
   prospect_id UUID REFERENCES outbound_prospects(id) ON DELETE CASCADE,
   campaign_id UUID REFERENCES outbound_campaigns(id) ON DELETE CASCADE,
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+  customer_id TEXT NOT NULL,
 
   -- Email details
   subject TEXT,
