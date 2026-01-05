@@ -438,9 +438,9 @@ function CampaignModal({ campaign, onClose, onSave }: CampaignModalProps) {
         campaign_name: formData.campaign_name,
         target_product: formData.target_product || null,
         target_icp: {
-          industries: formData.industries.split(',').map(s => s.trim()).filter(Boolean),
+          industries: formData.industries.split(',').map((s: string) => s.trim()).filter(Boolean),
           company_size: [formData.company_size_min, formData.company_size_max],
-          job_titles: formData.job_titles.split(',').map(s => s.trim()).filter(Boolean),
+          job_titles: formData.job_titles.split(',').map((s: string) => s.trim()).filter(Boolean),
         },
         status: formData.status as 'draft' | 'active' | 'paused' | 'completed',
         sender_name: formData.sender_name || null,
@@ -638,7 +638,7 @@ function CampaignModal({ campaign, onClose, onSave }: CampaignModalProps) {
             </label>
             <select
               value={formData.status}
-              onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+              onChange={(e) => setFormData({ ...formData, status: e.target.value as 'draft' | 'active' | 'paused' | 'completed' })}
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="draft">Draft</option>

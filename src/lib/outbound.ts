@@ -460,7 +460,8 @@ export async function getProspectStats(campaignId?: string) {
   // Count by status
   const stats = data.reduce(
     (acc, prospect) => {
-      acc[prospect.review_status] = (acc[prospect.review_status] || 0) + 1;
+      const status = prospect.review_status as ProspectStatus;
+      acc[status] = (acc[status] || 0) + 1;
       return acc;
     },
     {} as Record<ProspectStatus, number>

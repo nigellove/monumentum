@@ -76,7 +76,7 @@ export default function Hero({ onGetStarted, onSignUp, onOpenChat }: HeroProps) 
           <div className="max-w-7xl mx-auto px-6">
             <div className="flex flex-col sm:flex-row gap-4">
               <button
-                onClick={onSignUp}
+                onClick={() => onSignUp()}
                 className="px-8 py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-full font-semibold inline-flex items-center gap-2 transition shadow-lg hover:shadow-xl"
               >
                 Sign Up <ArrowRight className="w-5 h-5" />

@@ -217,7 +217,7 @@ window.location.href = checkoutUrl;
                 <option value="" className="text-slate-900">No purchase (just sign in)</option>
                 {PRODUCTS.map((product) => (
                   <option key={product.id} value={product.id} className="text-slate-900">
-                    {product.name} - ${product.price.toFixed(2)}/{product.billingCycle}
+                    {product.name} - ${product.price?.toFixed(2) || '0.00'}/{product.billingCycle}
                   </option>
                 ))}
               </select>
