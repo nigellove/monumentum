@@ -162,10 +162,10 @@ Deno.serve(async (req) => {
     const trackingPixelUrl = `${supabaseUrl}/functions/v1/track-email-open?prospect_id=${prospect_id}`;
 
     // SaaS Email Model:
-    // From: "Sender Name" via Monumentum <sales@monumentum.com>
+    // From: "Sender Name" via Monumentum <sales@monumentum.ai>
     // Reply-To: user's actual email (so replies go directly to them)
     const emailParams = {
-      Source: `"${campaign.sender_name}" via Monumentum <sales@monumentum.com>`,
+      Source: `"${campaign.sender_name}" via Monumentum <sales@monumentum.ai>`,
       Destination: {
         ToAddresses: [prospect.prospect_email]
       },
