@@ -1,6 +1,7 @@
-import { Menu, X, User } from 'lucide-react';
-import { useState } from 'react';
+import { Menu, X, User, Shield } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { isAdmin } from '../lib/admin/adminAuth';
 
 interface NavigationProps {
   onNavigate: (section: string) => void;
@@ -8,11 +9,25 @@ interface NavigationProps {
   onContactUs?: () => void;
   onSignIn: () => void;
   onOpenDashboard: () => void;
+  onOpenAdmin: () => void;
 }
 
-export default function Navigation({ onNavigate, onSignIn, onOpenDashboard }: NavigationProps) {
+export default function Navigation({ onNavigate, onSignIn, onOpenDashboard, onOpenAdmin }: NavigationProps) {
   const { user } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAdminUser, setIsAdminUser] = useState(false);
+
+  useEffect(() => {
+    async function checkAdmin() {
+      if (user) {
+        const admin = await isAdmin();
+        setIsAdminUser(admin);
+      } else {
+        setIsAdminUser(false);
+      }
+    }
+    checkAdmin();
+  }, [user]);
 
   const navItems = [
     { label: 'Home', id: 'home' },
@@ -48,13 +63,24 @@ export default function Navigation({ onNavigate, onSignIn, onOpenDashboard }: Na
             </button>
           ))}
           {user ? (
-            <button
-              onClick={onOpenDashboard}
-              className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-full font-semibold transition shadow-sm flex items-center gap-2"
-            >
-              <User size={18} />
-              My Portal
-            </button>
+            <div className="flex items-center gap-3">
+              {isAdminUser && (
+                <button
+                  onClick={onOpenAdmin}
+                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition shadow-sm flex items-center gap-2"
+                >
+                  <Shield size={18} />
+                  Admin
+                </button>
+              )}
+              <button
+                onClick={onOpenDashboard}
+                className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-full font-semibold transition shadow-sm flex items-center gap-2"
+              >
+                <User size={18} />
+                My Portal
+              </button>
+            </div>
           ) : (
             <button
               onClick={onSignIn}
@@ -90,16 +116,30 @@ export default function Navigation({ onNavigate, onSignIn, onOpenDashboard }: Na
               </button>
             ))}
             {user ? (
-              <button
-                onClick={() => {
-                  onOpenDashboard();
-                  setIsMenuOpen(false);
-                }}
-                className="flex items-center justify-center gap-2 w-full text-center px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-full font-semibold transition shadow-sm"
-              >
-                <User size={18} />
-                My Portal
-              </button>
+              <>
+                {isAdminUser && (
+                  <button
+                    onClick={() => {
+                      onOpenAdmin();
+                      setIsMenuOpen(false);
+                    }}
+                    className="flex items-center justify-center gap-2 w-full text-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition shadow-sm"
+                  >
+                    <Shield size={18} />
+                    Admin Panel
+                  </button>
+                )}
+                <button
+                  onClick={() => {
+                    onOpenDashboard();
+                    setIsMenuOpen(false);
+                  }}
+                  className="flex items-center justify-center gap-2 w-full text-center px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-full font-semibold transition shadow-sm"
+                >
+                  <User size={18} />
+                  My Portal
+                </button>
+              </>
             ) : (
               <button
                 onClick={() => {

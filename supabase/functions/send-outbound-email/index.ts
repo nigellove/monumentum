@@ -99,31 +99,52 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Check daily usage limits (Basic: 50, Pro: 200, Enterprise: Unlimited)
-    const today = new Date().toISOString().split('T')[0];
-    const { count: emailsSentToday } = await supabase
+    // Check monthly usage limits for Outbound products
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+
+    const { count: emailsSentThisMonth } = await supabase
       .from('outbound_email_logs')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', user_id)
-      .gte('sent_at', `${today}T00:00:00Z`)
+      .gte('sent_at', startOfMonth.toISOString())
       .eq('status', 'sent');
 
-    // Get user's subscription tier
-    const { data: subscription } = await supabase
-      .from('subscriptions')
-      .select('tier')
+    // Get user's Outbound product to check limits (allow both active and trialing)
+    const { data: userProducts } = await supabase
+      .from('user_products')
+      .select('product_id')
       .eq('user_id', user_id)
-      .eq('status', 'active')
-      .single();
+      .in('status', ['active', 'trialing'])
+      .in('product_id', ['outbound_sales_starter', 'outbound_sales_pro', 'outbound_sales_enterprise']);
 
-    const tier = subscription?.tier || 'basic';
-    const dailyLimit = tier === 'basic' ? 50 : tier === 'pro' ? 200 : 999999;
-
-    if ((emailsSentToday || 0) >= dailyLimit) {
+    // Check if user has an Outbound product
+    if (!userProducts || userProducts.length === 0) {
       return new Response(JSON.stringify({
-        error: 'Daily email limit reached',
-        limit: dailyLimit,
-        sent: emailsSentToday
+        error: 'No active Outbound product subscription found'
+      }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Map product to monthly email limit
+    const productId = userProducts[0].product_id;
+    const monthlyLimits: Record<string, number> = {
+      outbound_sales_starter: 750,
+      outbound_sales_pro: 2500,
+      outbound_sales_enterprise: 999999
+    };
+
+    const monthlyLimit = monthlyLimits[productId] || 750;
+
+    if ((emailsSentThisMonth || 0) >= monthlyLimit) {
+      return new Response(JSON.stringify({
+        error: 'Monthly email limit reached',
+        limit: monthlyLimit,
+        sent: emailsSentThisMonth,
+        product: productId
       }), {
         status: 429,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -218,7 +239,9 @@ Deno.serve(async (req) => {
     await supabase
       .from('outbound_prospects')
       .update({
-        email_status: 'sent',
+        review_status: 'sent',  // Update the field used for filtering/stats
+        email_status: 'sent',    // Keep for tracking
+        sent_at: new Date().toISOString(),
         last_contacted_at: new Date().toISOString()
       })
       .eq('id', prospect_id);
@@ -227,8 +250,9 @@ Deno.serve(async (req) => {
       success: true,
       message: 'Email sent successfully',
       message_id: sendResult.MessageId,
-      emails_sent_today: (emailsSentToday || 0) + 1,
-      daily_limit: dailyLimit
+      emails_sent_this_month: (emailsSentThisMonth || 0) + 1,
+      monthly_limit: monthlyLimit,
+      product: productId
     }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }

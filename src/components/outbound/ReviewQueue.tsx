@@ -7,8 +7,9 @@ import {
   OutboundProspect,
   ProspectStatus
 } from '../../lib/outbound';
+import { supabase } from '../../lib/supabase';
 import ProspectCard from './ProspectCard';
-import { CheckCircle, Filter, Mail, TrendingUp, Clock, Users } from 'lucide-react';
+import { CheckCircle, Filter, Mail, TrendingUp, Clock, Users, Send } from 'lucide-react';
 
 export default function ReviewQueue() {
   const { user } = useAuth();
@@ -16,6 +17,7 @@ export default function ReviewQueue() {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [sending, setSending] = useState(false);
 
   // Filters
   const [statusFilter, setStatusFilter] = useState<ProspectStatus>('pending_review');
@@ -29,9 +31,15 @@ export default function ReviewQueue() {
     try {
       setLoading(true);
 
-      const filters: any = {
-        review_status: statusFilter,
-      };
+      const filters: any = {};
+
+      // For "Draft" filter (pending_review), we need to fetch both pending_review AND approved
+      // since we simplified the workflow but some prospects may still be in "approved" state
+      if (statusFilter === 'pending_review') {
+        // Don't set review_status filter - we'll filter manually
+      } else {
+        filters.review_status = statusFilter;
+      }
 
       if (productFilter) {
         filters.matched_product = productFilter;
@@ -42,7 +50,15 @@ export default function ReviewQueue() {
         getProspectStats()
       ]);
 
-      setProspects(prospectsData);
+      // If viewing "Draft", filter to show both pending_review AND approved
+      let filteredProspects = prospectsData;
+      if (statusFilter === 'pending_review') {
+        filteredProspects = prospectsData.filter(
+          p => p.review_status === 'pending_review' || p.review_status === 'approved'
+        );
+      }
+
+      setProspects(filteredProspects);
       setStats(statsData);
     } catch (error) {
       console.error('Error loading review queue:', error);
@@ -68,6 +84,82 @@ export default function ReviewQueue() {
     } catch (error) {
       console.error('Error bulk approving:', error);
       alert('Failed to approve prospects');
+    }
+  };
+
+  const handleBulkSend = async () => {
+    if (!user?.id) {
+      alert('You must be logged in to send emails');
+      return;
+    }
+
+    if (selectedIds.length === 0) {
+      alert('No prospects selected');
+      return;
+    }
+
+    // Show confirmation with content reminder
+    const confirmMessage = `Send ${selectedIds.length} email${selectedIds.length > 1 ? 's' : ''}?\n\nPlease make sure you are comfortable with the email content before sending.\n\nClick OK to send all selected emails.`;
+
+    if (!confirm(confirmMessage)) {
+      return;
+    }
+
+    try {
+      setSending(true);
+      let sent = 0;
+      let failed = 0;
+      const { data: { session } } = await supabase.auth.getSession();
+
+      for (const id of selectedIds) {
+        const prospect = prospects.find(p => p.id === id);
+        if (!prospect) continue;
+
+        try {
+          const response = await fetch(
+            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-outbound-email`,
+            {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${session?.access_token || import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                prospect_id: id,
+                campaign_id: prospect.campaign_id,
+                user_id: user.id
+              })
+            }
+          );
+
+          if (response.ok) {
+            sent++;
+          } else {
+            failed++;
+            const errorData = await response.json().catch(() => ({}));
+            console.error(`Failed to send to ${prospect.prospect_email}:`, {
+              status: response.status,
+              error: errorData
+            });
+          }
+        } catch (error) {
+          failed++;
+          console.error(`Error sending to ${prospect.prospect_email}:`, error);
+        }
+      }
+
+      alert(
+        `✅ Bulk send complete!\n\nSent: ${sent}\nFailed: ${failed}${
+          failed > 0 ? '\n\nCheck console for details.' : ''
+        }`
+      );
+      setSelectedIds([]);
+      await loadData();
+    } catch (error) {
+      console.error('Error in bulk send:', error);
+      alert('Failed to send emails. Please try again.');
+    } finally {
+      setSending(false);
     }
   };
 
@@ -103,24 +195,14 @@ export default function ReviewQueue() {
 
       {/* Stats Bar */}
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-lg border border-blue-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold text-blue-600 mb-1">Pending Review</p>
-                <p className="text-3xl font-bold text-blue-900">{stats.pending_review}</p>
+                <p className="text-sm font-semibold text-blue-600 mb-1">Draft</p>
+                <p className="text-3xl font-bold text-blue-900">{stats.pending_review + stats.approved}</p>
               </div>
               <Clock className="w-12 h-12 text-blue-400" />
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-lg border border-green-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-semibold text-green-600 mb-1">Approved</p>
-                <p className="text-3xl font-bold text-green-900">{stats.approved}</p>
-              </div>
-              <CheckCircle className="w-12 h-12 text-green-400" />
             </div>
           </div>
 
@@ -157,9 +239,7 @@ export default function ReviewQueue() {
               onChange={(e) => setStatusFilter(e.target.value as ProspectStatus)}
               className="px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <option value="pending_review">Pending Review</option>
-              <option value="approved">Approved</option>
-              <option value="rejected">Rejected</option>
+              <option value="pending_review">Draft</option>
               <option value="sent">Sent</option>
               <option value="opened">Opened</option>
               <option value="clicked">Clicked</option>
@@ -191,11 +271,12 @@ export default function ReviewQueue() {
                   {selectedIds.length} selected
                 </span>
                 <button
-                  onClick={handleBulkApprove}
-                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold flex items-center gap-2"
+                  onClick={handleBulkSend}
+                  disabled={sending}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <CheckCircle className="w-5 h-5" />
-                  Approve Selected
+                  <Send className="w-5 h-5" />
+                  {sending ? 'Sending...' : 'Send Selected'}
                 </button>
               </div>
             </>
@@ -220,7 +301,7 @@ export default function ReviewQueue() {
       ) : (
         <>
           {/* Select All */}
-          {prospects.length > 0 && statusFilter === 'pending_review' && (
+          {prospects.length > 0 && (statusFilter === 'pending_review' || statusFilter === 'approved') && (
             <div className="mb-4">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -245,7 +326,7 @@ export default function ReviewQueue() {
                 onUpdate={handleProspectUpdate}
                 selected={selectedIds.includes(prospect.id)}
                 onToggleSelect={() => toggleSelection(prospect.id)}
-                showCheckbox={statusFilter === 'pending_review'}
+                showCheckbox={statusFilter === 'pending_review' || statusFilter === 'approved'}
               />
             ))}
           </div>

@@ -231,9 +231,14 @@ export async function getProspects(filters?: {
   limit?: number;
   offset?: number;
 }) {
+  // Get current user to ensure we only fetch their prospects
+  const { data: user } = await supabase.auth.getUser();
+  if (!user.user) throw new Error('Not authenticated');
+
   let query = supabase
     .from('outbound_prospects')
     .select('*')
+    .eq('user_id', user.user.id)  // CRITICAL: Filter by current user
     .order('created_at', { ascending: false });
 
   if (filters?.campaign_id) {
@@ -447,7 +452,14 @@ export async function checkUsageLimits(
 // ============================================================================
 
 export async function getProspectStats(campaignId?: string) {
-  let query = supabase.from('outbound_prospects').select('review_status');
+  // Get current user to ensure we only count their prospects
+  const { data: user } = await supabase.auth.getUser();
+  if (!user.user) throw new Error('Not authenticated');
+
+  let query = supabase
+    .from('outbound_prospects')
+    .select('review_status')
+    .eq('user_id', user.user.id);  // CRITICAL: Filter by current user
 
   if (campaignId) {
     query = query.eq('campaign_id', campaignId);

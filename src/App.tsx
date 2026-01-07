@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import Navigation from './components/Navigation'
 import Hero from './components/Hero'
@@ -22,11 +23,41 @@ import ResetPassword from './components/ResetPassword'
 import TermsOfService from './components/TermsOfService'
 import CookieBanner from './components/CookieBanner'
 import PaymentSuccess from './components/PaymentSuccess'
+import AdminLayout from './pages/admin/AdminLayout'
 import { useAuth } from './contexts/AuthContext'
 import { supabase } from './lib/supabase'
+import { useAdminAuth } from './hooks/admin/useAdminAuth'
+
+// Protected route wrapper for admin pages
+function ProtectedAdminRoute({ children }: { children: React.ReactNode }) {
+  const { isAdminUser, loading } = useAdminAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && !isAdminUser) {
+      navigate('/');
+    }
+  }, [isAdminUser, loading, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <p className="mt-2 text-slate-600">Checking admin access...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAdminUser) return null;
+
+  return <>{children}</>;
+}
 
 function AppContent() {
   const { user, loading } = useAuth();
+  const location = useLocation();
   const [hasAccess, setHasAccess] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
@@ -41,6 +72,9 @@ function AppContent() {
   const [isResetPasswordOpen, setIsResetPasswordOpen] = useState(false);
   const [isPaymentSuccessOpen, setIsPaymentSuccessOpen] = useState(false);
   const [isCheckingRecovery, setIsCheckingRecovery] = useState(true);
+
+  // Check if we're on admin route
+  const isAdminRoute = location.pathname.startsWith('/admin');
 
   // PRIORITY 1: Check for password recovery token FIRST (before anything else)
   useEffect(() => {
@@ -152,6 +186,12 @@ useEffect(() => {
     setIsDashboardOpen(true);
   };
 
+  const navigate = useNavigate();
+
+  const handleOpenAdmin = () => {
+    navigate('/admin');
+  };
+
   const handleResetPasswordClose = () => {
     setIsResetPasswordOpen(false);
     // Clean up URL hash after closing
@@ -208,81 +248,100 @@ useEffect(() => {
   return <AccessGate onAccessGranted={handleAccessGranted} />;
 }
 
-  // NORMAL APP: Show full site after beta access granted
+  // NORMAL APP: Show full site after beta access granted OR admin panel
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      <Navigation
-        onNavigate={handleNavigate}
-        onGetStarted={handleGetStarted}
-        onContactUs={handleContactUs}
-        onSignIn={handleSignIn}
-        onOpenDashboard={handleOpenDashboard}
+    <Routes>
+      {/* Admin Routes - Protected */}
+      <Route
+        path="/admin/*"
+        element={
+          <ProtectedAdminRoute>
+            <AdminLayout />
+          </ProtectedAdminRoute>
+        }
       />
-      <FloatingBadge onOpenChat={handleOpenChat} />
-      <Hero onGetStarted={handleGetStarted} onSignUp={handleSignUp} 
-        onOpenChat={() => setIsChatOpen(true)}/>
-      <Solutions
-        onContactUs={handleContactUs}
-        onOpenChat={handleOpenChat}
-        onSignUp={handleSignUp}
-        //onOpenChat={() => setIsChatOpen(true)}
+
+      {/* Main App Route */}
+      <Route
+        path="*"
+        element={
+          <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+            <Navigation
+              onNavigate={handleNavigate}
+              onGetStarted={handleGetStarted}
+              onContactUs={handleContactUs}
+              onSignIn={handleSignIn}
+              onOpenDashboard={handleOpenDashboard}
+              onOpenAdmin={handleOpenAdmin}
+            />
+            <FloatingBadge onOpenChat={handleOpenChat} />
+            <Hero onGetStarted={handleGetStarted} onSignUp={handleSignUp}
+              onOpenChat={() => setIsChatOpen(true)}/>
+            <Solutions
+              onContactUs={handleContactUs}
+              onOpenChat={handleOpenChat}
+              onSignUp={handleSignUp}
+              //onOpenChat={() => setIsChatOpen(true)}
+            />
+            <Services onContactUs={handleContactUs} onOpenChat={handleOpenChat} />
+            <Pricing onSignUp={handleSignUp} onContactUs={handleContactUs} />
+            <About />
+            <FAQ />
+            <Contact onOpenChat={handleOpenChat} />
+            <Footer
+              onOpenChat={handleOpenChat}
+              onOpenDocs={(section) => {
+                setDocsSection(section || 'installation');
+                setIsDocsOpen(true);
+              }}
+              onOpenPrivacy={() => setIsPrivacyOpen(true)}
+            />
+            <CookieBanner />
+            <ChatWidget isOpen={isChatOpen} onClose={handleCloseChat} />
+            <EmailModal isOpen={isEmailModalOpen} onClose={() => setIsEmailModalOpen(false)} />
+
+            {isDocsOpen && (
+              <Documentation
+                onClose={() => setIsDocsOpen(false)}
+                initialSection={docsSection}
+              />
+            )}
+
+            {isSignInOpen && (
+              <SignIn
+                onClose={() => setIsSignInOpen(false)}
+                onSwitchToSignUp={() => {
+                  setIsSignInOpen(false);
+                  setIsSignUpOpen(true);
+                }}
+              />
+            )}
+
+            {isSignUpOpen && (
+              <SignUp
+                onClose={() => {
+                  setIsSignUpOpen(false);
+                  setSelectedProductId(null);
+                }}
+                onSwitchToSignIn={() => {
+                  setIsSignUpOpen(false);
+                  setIsSignInOpen(true);
+                }}
+                initialProductId={selectedProductId}
+              />
+            )}
+
+            {isDashboardOpen && user && (
+              <UserDashboard onClose={() => setIsDashboardOpen(false)} />
+            )}
+
+            {isPrivacyOpen && (
+              <PrivacyPolicy onClose={() => setIsPrivacyOpen(false)} />
+            )}
+          </div>
+        }
       />
-      <Services onContactUs={handleContactUs} onOpenChat={handleOpenChat} />
-      <Pricing onSignUp={handleSignUp} onContactUs={handleContactUs} />
-      <About />
-      <FAQ />
-      <Contact onOpenChat={handleOpenChat} />
-      <Footer
-        onOpenChat={handleOpenChat}
-        onOpenDocs={(section) => {
-          setDocsSection(section || 'installation');
-          setIsDocsOpen(true);
-        }}
-        onOpenPrivacy={() => setIsPrivacyOpen(true)}
-      />
- <CookieBanner />
-      <ChatWidget isOpen={isChatOpen} onClose={handleCloseChat} />
-      <EmailModal isOpen={isEmailModalOpen} onClose={() => setIsEmailModalOpen(false)} />
-
-      {isDocsOpen && (
-        <Documentation
-          onClose={() => setIsDocsOpen(false)}
-          initialSection={docsSection}
-        />
-      )}
-
-      {isSignInOpen && (
-        <SignIn
-          onClose={() => setIsSignInOpen(false)}
-          onSwitchToSignUp={() => {
-            setIsSignInOpen(false);
-            setIsSignUpOpen(true);
-          }}
-        />
-      )}
-
-      {isSignUpOpen && (
-        <SignUp
-          onClose={() => {
-            setIsSignUpOpen(false);
-            setSelectedProductId(null);
-          }}
-          onSwitchToSignIn={() => {
-            setIsSignUpOpen(false);
-            setIsSignInOpen(true);
-          }}
-          initialProductId={selectedProductId}
-        />
-      )}
-
-      {isDashboardOpen && user && (
-        <UserDashboard onClose={() => setIsDashboardOpen(false)} />
-      )}
-
-      {isPrivacyOpen && (
-        <PrivacyPolicy onClose={() => setIsPrivacyOpen(false)} />
-      )}
-    </div>
+    </Routes>
   )
 }
 

@@ -77,8 +77,7 @@ export const PRODUCTS: Product[] = [
     id: 'outbound_sales_starter',
     name: 'Outbound Sales Agent - Starter',
     price: 39.99,
-    // TODO: Replace outbound placeholder Stripe IDs/links with real products before launch.
-    priceId: 'price_outbound_starter_placeholder',
+    priceId: 'price_1Sn1urHNpNXABf4qpxRG2wXN',
     billingCycle: 'monthly',
     description: 'Human-in-the-loop outbound sales with 750 emails per month',
     features: [
@@ -89,7 +88,7 @@ export const PRODUCTS: Product[] = [
       'Email tracking',
       '750 emails per month'
     ],
-    stripeLink: '',
+    stripeLink: 'https://buy.stripe.com/aFa7sL6gae4Ybg4fFrdby04',
     trialDays: 30,
     monthlyEmailLimit: 750,
     purchaseType: 'checkout'
@@ -98,7 +97,7 @@ export const PRODUCTS: Product[] = [
     id: 'outbound_sales_pro',
     name: 'Outbound Sales Agent - Pro',
     price: 59.99,
-    priceId: 'price_outbound_pro_placeholder',
+    priceId: 'price_1Sn1wdHNpNXABf4qXRyLLrln',
     billingCycle: 'monthly',
     description: 'Higher volume outbound sales with 2,500 emails per month',
     features: [
@@ -109,7 +108,7 @@ export const PRODUCTS: Product[] = [
       'Priority support',
       '2,500 emails per month'
     ],
-    stripeLink: '',
+    stripeLink: 'https://buy.stripe.com/dRmfZhbAu9OI4RG9h3dby05',
     trialDays: 30,
     monthlyEmailLimit: 2500,
     purchaseType: 'checkout'

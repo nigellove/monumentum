@@ -5,6 +5,8 @@ import {
   deleteProspect,
   OutboundProspect
 } from '../../lib/outbound';
+import { useAuth } from '../../contexts/AuthContext';
+import { supabase } from '../../lib/supabase';
 import {
   CheckCircle,
   XCircle,
@@ -18,7 +20,8 @@ import {
   Trash2,
   ExternalLink,
   Target,
-  TrendingUp
+  TrendingUp,
+  Send
 } from 'lucide-react';
 
 interface ProspectCardProps {
@@ -36,12 +39,14 @@ export default function ProspectCard({
   onToggleSelect,
   showCheckbox = false
 }: ProspectCardProps) {
+  const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [editedSubject, setEditedSubject] = useState(prospect.draft_subject || '');
   const [editedMessage, setEditedMessage] = useState(prospect.draft_message || '');
   const [rejectionReason, setRejectionReason] = useState('');
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const [sending, setSending] = useState(false);
 
   const handleApprove = async () => {
     try {
@@ -96,6 +101,61 @@ export default function ProspectCard({
     }
   };
 
+  const handleSendEmail = async () => {
+    if (!user?.id) {
+      alert('You must be logged in to send emails');
+      return;
+    }
+
+    // Show confirmation with content reminder
+    const confirmMessage = `Send email to ${prospect.prospect_email}?\n\nPlease make sure you are comfortable with the email content before sending.\n\nSubject: ${editedSubject}\n\nClick OK to send.`;
+
+    if (!confirm(confirmMessage)) {
+      return;
+    }
+
+    try {
+      setSending(true);
+
+      // If edited, save edits first
+      if (isEditing && (editedSubject !== prospect.draft_subject || editedMessage !== prospect.draft_message)) {
+        await approveProspect(prospect.id, editedSubject, editedMessage);
+      }
+
+      const { data: { session } } = await supabase.auth.getSession();
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-outbound-email`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session?.access_token || import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            prospect_id: prospect.id,
+            campaign_id: prospect.campaign_id,
+            user_id: user.id
+          })
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        alert(`✅ Email sent successfully!\n\nThe email has been sent to ${prospect.prospect_email}.`);
+        onUpdate();
+      } else {
+        const error = await response.json();
+        alert(`Failed to send email: ${error.error || error.message}`);
+      }
+    } catch (error) {
+      console.error('Error sending email:', error);
+      alert('Failed to send email. Please try again.');
+    } finally {
+      setSending(false);
+    }
+  };
+
   const getChannelIcon = () => {
     switch (prospect.channel) {
       case 'email':
@@ -124,8 +184,8 @@ export default function ProspectCard({
 
   const getStatusBadge = () => {
     const statusConfig: Record<string, { color: string; label: string }> = {
-      pending_review: { color: 'bg-yellow-100 text-yellow-800', label: 'Pending Review' },
-      approved: { color: 'bg-green-100 text-green-800', label: 'Approved' },
+      pending_review: { color: 'bg-slate-100 text-slate-800', label: 'Draft' },
+      approved: { color: 'bg-slate-100 text-slate-800', label: 'Draft' },
       rejected: { color: 'bg-red-100 text-red-800', label: 'Rejected' },
       sent: { color: 'bg-blue-100 text-blue-800', label: 'Sent' },
       opened: { color: 'bg-purple-100 text-purple-800', label: 'Opened' },
@@ -322,7 +382,7 @@ export default function ProspectCard({
             )}
 
             {/* Actions */}
-            {prospect.review_status === 'pending_review' && (
+            {(prospect.review_status === 'pending_review' || prospect.review_status === 'approved') && (
               <div className="mt-6 flex flex-wrap gap-3">
                 <button
                   onClick={() => setIsEditing(!isEditing)}
@@ -333,28 +393,19 @@ export default function ProspectCard({
                 </button>
 
                 <button
-                  onClick={handleApprove}
-                  disabled={processing}
-                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold flex items-center gap-2 disabled:opacity-50"
+                  onClick={handleSendEmail}
+                  disabled={sending}
+                  className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <CheckCircle className="w-4 h-4" />
-                  {isEditing ? 'Approve with Edits' : 'Approve'}
-                </button>
-
-                <button
-                  onClick={() => setShowRejectModal(true)}
-                  disabled={processing}
-                  className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold flex items-center gap-2 disabled:opacity-50"
-                >
-                  <XCircle className="w-4 h-4" />
-                  Reject
+                  <Send className="w-5 h-5" />
+                  {sending ? 'Sending...' : 'Send Email'}
                 </button>
 
                 <div className="flex-1" />
 
                 <button
                   onClick={handleDelete}
-                  disabled={processing}
+                  disabled={processing || sending}
                   className="px-4 py-2 bg-slate-100 text-red-600 rounded-lg hover:bg-red-50 transition font-semibold flex items-center gap-2 disabled:opacity-50"
                 >
                   <Trash2 className="w-4 h-4" />
