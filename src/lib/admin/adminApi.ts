@@ -16,9 +16,11 @@ interface AdminUser {
   email: string;
   created_at: string;
   user_metadata?: any;
-  customer_id?: string;
-  business_name?: string;
-  subscription?: any;
+  customer_id: string;
+  business_name: string;
+  business_email: string;
+  subscription: any;
+  blocked: boolean;
 }
 
 interface UsageStats {

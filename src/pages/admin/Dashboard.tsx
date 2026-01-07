@@ -65,7 +65,7 @@ export default function Dashboard() {
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <p className="text-red-800">Error: {error}</p>
           <button
-            onClick={loadStats}
+            onClick={loadDashboardData}
             className="mt-2 px-4 py-2 bg-red-100 text-red-800 rounded hover:bg-red-200"
           >
             Retry

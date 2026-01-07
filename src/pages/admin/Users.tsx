@@ -3,23 +3,20 @@ import { RefreshCw } from 'lucide-react';
 import UserTable from '../../components/admin/UserTable';
 import { adminApi } from '../../lib/admin/adminApi';
 
-interface User {
+interface AdminUser {
   id: string;
   email: string;
   created_at: string;
+  user_metadata?: any;
   customer_id: string;
-  business_name: string | null;
-  business_email: string | null;
-  subscription: {
-    tier: string;
-    status: string;
-    current_period_end: string;
-  } | null;
+  business_name: string;
+  business_email: string;
+  subscription: any;
   blocked: boolean;
 }
 
 export default function Users() {
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
