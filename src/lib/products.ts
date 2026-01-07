@@ -89,7 +89,7 @@ export const PRODUCTS: Product[] = [
       '750 emails per month'
     ],
     stripeLink: 'https://buy.stripe.com/aFa7sL6gae4Ybg4fFrdby04',
-    trialDays: 30,
+    trialDays: 7,
     monthlyEmailLimit: 750,
     purchaseType: 'checkout'
   },
@@ -109,7 +109,7 @@ export const PRODUCTS: Product[] = [
       '2,500 emails per month'
     ],
     stripeLink: 'https://buy.stripe.com/dRmfZhbAu9OI4RG9h3dby05',
-    trialDays: 30,
+    trialDays: 7,
     monthlyEmailLimit: 2500,
     purchaseType: 'checkout'
   },
