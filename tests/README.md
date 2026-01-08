@@ -94,8 +94,21 @@ Example output:
 
 ## 🐛 Troubleshooting
 
-### "Failed to create test user"
-- Check that SUPABASE_SERVICE_ROLE_KEY is set correctly
+### "Failed to create test user" or "User not allowed"
+**This is the most common issue!** The error means Supabase auth settings are blocking user creation.
+
+**Fix:**
+1. Go to your Supabase Dashboard: Authentication → Providers → Email
+2. Enable these settings:
+   - ✅ Enable email provider
+   - ✅ Confirm email (can be disabled for testing)
+3. Go to Authentication → Settings:
+   - ✅ Allow new users to sign up
+4. If using a production database for testing (not recommended), make sure you're using test environment instead
+
+**Also check:**
+- SUPABASE_SERVICE_ROLE_KEY is set correctly in [.env.test](monumentum/.env.test)
+- You're using the SERVICE ROLE key, not the anon key
 - Verify Supabase project is accessible
 
 ### "fetch failed" or timeout errors

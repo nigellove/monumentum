@@ -12,7 +12,12 @@ import { generateTestId } from '../setup';
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL!;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false
+  }
+});
 
 describe('Outbound Email Limits API', () => {
   let testUserId: string;
@@ -77,7 +82,7 @@ describe('Outbound Email Limits API', () => {
         campaign_id: testCampaignId,
         prospect_email: 'prospect@example.com',
         prospect_name: 'Test Prospect',
-        company: 'Test Company',
+        company_name: 'Test Company',
         draft_subject: 'Test Subject',
         draft_message: 'Test message',
         review_status: 'approved'

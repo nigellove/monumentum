@@ -48,12 +48,11 @@ Deno.serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Fetch prospect data
+    // Fetch prospect data WITHOUT user_id filter first (to detect tenant violations)
     const { data: prospect, error: prospectError } = await supabase
       .from('outbound_prospects')
-      .select('*')
+      .select('*, customer_id')
       .eq('id', prospect_id)
-      .eq('user_id', user_id)
       .single();
 
     if (prospectError || !prospect) {
@@ -66,12 +65,11 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Fetch campaign data (for sender name and reply-to)
+    // Fetch campaign data WITHOUT user_id filter first (to detect tenant violations)
     const { data: campaign, error: campaignError } = await supabase
       .from('outbound_campaigns')
-      .select('sender_name, reply_to_email, email_signature, customer_id')
+      .select('user_id, customer_id, sender_name, reply_to_email, email_signature')
       .eq('id', campaign_id)
-      .eq('user_id', user_id)
       .single();
 
     if (campaignError || !campaign) {
@@ -84,15 +82,44 @@ Deno.serve(async (req) => {
       });
     }
 
+    // CRITICAL: Verify tenant isolation - check user_id matches
+    if (prospect.user_id !== user_id) {
+      console.error('Tenant isolation violation: prospect user_id mismatch:', {
+        prospect_user_id: prospect.user_id,
+        requested_user_id: user_id,
+        prospect_id: prospect_id
+      });
+      return new Response(JSON.stringify({
+        error: 'Tenant isolation violation'
+      }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    if (campaign.user_id !== user_id) {
+      console.error('Tenant isolation violation: campaign user_id mismatch:', {
+        campaign_user_id: campaign.user_id,
+        requested_user_id: user_id,
+        campaign_id: campaign_id
+      });
+      return new Response(JSON.stringify({
+        error: 'Tenant isolation violation'
+      }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
     // CRITICAL: Verify tenant isolation - campaign and prospect must have same customer_id
     if (campaign.customer_id !== prospect.customer_id) {
-      console.error('Tenant isolation violation detected:', {
+      console.error('Tenant isolation violation: customer_id mismatch:', {
         campaign_customer_id: campaign.customer_id,
         prospect_customer_id: prospect.customer_id,
         user_id: user_id
       });
       return new Response(JSON.stringify({
-        error: 'Access denied: Tenant isolation violation'
+        error: 'Tenant isolation violation'
       }), {
         status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }

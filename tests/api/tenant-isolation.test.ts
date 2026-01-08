@@ -12,7 +12,12 @@ import { generateTestId } from '../setup';
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL!;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false
+  }
+});
 
 describe('Tenant Isolation API', () => {
   let userA: { id: string; email: string; customerId: string; token: string; campaignId: string; prospectId: string };
@@ -21,23 +26,27 @@ describe('Tenant Isolation API', () => {
   beforeAll(async () => {
     // Create User A
     const emailA = `test_a_${generateTestId('email')}@example.com`;
-    const { data: authDataA } = await supabase.auth.admin.createUser({
+    const { data: authDataA, error: authErrorA } = await supabase.auth.admin.createUser({
       email: emailA,
       password: 'TestPassword123!',
       email_confirm: true
     });
 
+    if (authErrorA || !authDataA?.user) {
+      throw new Error(`Failed to create User A: ${authErrorA?.message || 'No user data returned'}`);
+    }
+
     const customerIdA = generateTestId('customer_a');
 
     await supabase.from('business_profiles').insert({
-      user_id: authDataA!.user.id,
+      user_id: authDataA.user.id,
       customer_id: customerIdA,
       business_name: 'Test Business A',
       business_email: emailA
     });
 
     await supabase.from('user_products').insert({
-      user_id: authDataA!.user.id,
+      user_id: authDataA.user.id,
       customer_id: customerIdA,
       product_id: 'outbound_sales_pro',
       product_name: 'Outbound Sales Agent - Pro',
@@ -52,7 +61,7 @@ describe('Tenant Isolation API', () => {
     const { data: campaignA } = await supabase
       .from('outbound_campaigns')
       .insert({
-        user_id: authDataA!.user.id,
+        user_id: authDataA.user.id,
         customer_id: customerIdA,
         campaign_name: 'Campaign A',
         sender_name: 'Sender A',
@@ -62,15 +71,15 @@ describe('Tenant Isolation API', () => {
       .select()
       .single();
 
-    const { data: prospectA } = await supabase
+    const { data: prospectA, error: prospectErrorA } = await supabase
       .from('outbound_prospects')
       .insert({
-        user_id: authDataA!.user.id,
+        user_id: authDataA.user.id,
         customer_id: customerIdA,
         campaign_id: campaignA.id,
         prospect_email: 'prospect_a@example.com',
         prospect_name: 'Prospect A',
-        company: 'Company A',
+        company_name: 'Company A',
         draft_subject: 'Subject A',
         draft_message: 'Message A',
         review_status: 'approved'
@@ -78,8 +87,12 @@ describe('Tenant Isolation API', () => {
       .select()
       .single();
 
+    if (prospectErrorA || !prospectA) {
+      throw new Error(`Failed to create Prospect A: ${prospectErrorA?.message || 'No data returned'}`);
+    }
+
     userA = {
-      id: authDataA!.user.id,
+      id: authDataA.user.id,
       email: emailA,
       customerId: customerIdA,
       token: sessionA.session?.access_token || '',
@@ -89,11 +102,15 @@ describe('Tenant Isolation API', () => {
 
     // Create User B (different customer)
     const emailB = `test_b_${generateTestId('email')}@example.com`;
-    const { data: authDataB } = await supabase.auth.admin.createUser({
+    const { data: authDataB, error: authErrorB } = await supabase.auth.admin.createUser({
       email: emailB,
       password: 'TestPassword123!',
       email_confirm: true
     });
+
+    if (authErrorB || !authDataB?.user) {
+      throw new Error(`Failed to create User B: ${authErrorB?.message || 'No user data returned'}`);
+    }
 
     const customerIdB = generateTestId('customer_b');
 
@@ -105,7 +122,7 @@ describe('Tenant Isolation API', () => {
     });
 
     await supabase.from('user_products').insert({
-      user_id: authDataB!.user.id,
+      user_id: authDataB.user.id,
       customer_id: customerIdB,
       product_id: 'outbound_sales_pro',
       product_name: 'Outbound Sales Agent - Pro',
@@ -120,7 +137,7 @@ describe('Tenant Isolation API', () => {
     const { data: campaignB } = await supabase
       .from('outbound_campaigns')
       .insert({
-        user_id: authDataB!.user.id,
+        user_id: authDataB.user.id,
         customer_id: customerIdB,
         campaign_name: 'Campaign B',
         sender_name: 'Sender B',
@@ -133,12 +150,12 @@ describe('Tenant Isolation API', () => {
     const { data: prospectB } = await supabase
       .from('outbound_prospects')
       .insert({
-        user_id: authDataB!.user.id,
+        user_id: authDataB.user.id,
         customer_id: customerIdB,
         campaign_id: campaignB.id,
         prospect_email: 'prospect_b@example.com',
         prospect_name: 'Prospect B',
-        company: 'Company B',
+        company_name: 'Company B',
         draft_subject: 'Subject B',
         draft_message: 'Message B',
         review_status: 'approved'
@@ -147,7 +164,7 @@ describe('Tenant Isolation API', () => {
       .single();
 
     userB = {
-      id: authDataB!.user.id,
+      id: authDataB.user.id,
       email: emailB,
       customerId: customerIdB,
       token: sessionB.session?.access_token || '',
@@ -249,7 +266,7 @@ describe('Tenant Isolation API', () => {
 
   it('should prevent prospect with mismatched customer_id', async () => {
     // Manually create a prospect with User A's user_id but User B's customer_id (data corruption scenario)
-    const { data: badProspect } = await supabase
+    const { data: badProspect, error: badProspectError } = await supabase
       .from('outbound_prospects')
       .insert({
         user_id: userA.id,
@@ -257,13 +274,17 @@ describe('Tenant Isolation API', () => {
         campaign_id: userA.campaignId,
         prospect_email: 'bad@example.com',
         prospect_name: 'Bad Prospect',
-        company: 'Bad Company',
+        company_name: 'Bad Company',
         draft_subject: 'Bad Subject',
         draft_message: 'Bad Message',
         review_status: 'approved'
       })
       .select()
       .single();
+    if (badProspectError || !badProspect) {
+      throw new Error(`Failed to create bad prospect: ${badProspectError?.message || "No data returned"}`);
+    }
+
 
     const response = await fetch(
       `${supabaseUrl}/functions/v1/send-outbound-email`,
@@ -286,6 +307,6 @@ describe('Tenant Isolation API', () => {
     expect(data.error).toContain('Tenant isolation violation');
 
     // Cleanup
-    await supabase.from('outbound_prospects').delete().eq('id', badProspect!.id);
+    await supabase.from('outbound_prospects').delete().eq('id', badProspect.id);
   });
 });
